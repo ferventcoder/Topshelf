@@ -33,6 +33,12 @@ namespace Topshelf.Configuration.Dsl
         void ConfigureServiceInIsolation<TService>(Action<IIsolatedServiceConfigurator<TService>> action) where TService : class;
 
         /// <summary>
+        /// Configures a service using a completely separate appdomain and a completely different private bin folder
+        /// </summary>
+        /// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
+        void ConfigureServiceInShelving(Action<IShelvedServiceConfigurator> action);
+
+        /// <summary>
         /// Sets the display name of the service within the Service Control Manager.
         /// </summary>
         /// <param name="displayName">The display name of the service.</param>
@@ -150,5 +156,6 @@ namespace Topshelf.Configuration.Dsl
         /// </summary>
         /// <param name="action">The action or actions that will be performed after the service stops.</param>
         void AfterStoppingTheHost(Action<IServiceCoordinator> action);
+
     }
 }

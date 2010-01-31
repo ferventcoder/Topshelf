@@ -66,6 +66,7 @@
     <Compile Include="Commands\WinService\SubCommands\UninstallService.cs" />
     <Compile Include="Configuration\Dsl\ActivatorServiceLocator.cs" />
     <Compile Include="Commands\WinService\SubCommands\WinServiceHelper.cs" />
+    <Compile Include="Configuration\Dsl\IShelvedServiceConfigurator.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\IsolatedServiceConfigurator.cs" />
