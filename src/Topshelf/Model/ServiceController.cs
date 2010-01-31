@@ -109,6 +109,11 @@ namespace Topshelf.Model
 
         #region IServiceController Members
 
+        public void Initialize()
+        {
+            
+        }
+
         public void Start()
         {
             RaiseEvent(OnStart);

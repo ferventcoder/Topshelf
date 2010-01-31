@@ -15,7 +15,8 @@ namespace Topshelf.Model.Shelving
     using System;
 
     [Serializable]
-    public class ShelvedAppDomainManager
+    public class ShelvedAppDomainManager :
+        MarshalByRefObject
     {
         readonly IServiceController _controller;
 

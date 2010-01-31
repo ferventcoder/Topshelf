@@ -13,10 +13,11 @@
 namespace Topshelf.Model.Shelving
 {
     using System;
+    using Isolated;
 
     public class AppDomainFactory
     {
-        public AppDomain CreateNewAppDomain(ShelvedServiceInfo info)
+        public static AppDomain CreateNewAppDomain(ShelvedServiceInfo info)
         {
             var setup = AppDomain.CurrentDomain.SetupInformation;
             setup.PrivateBinPath = info.FullPath;
@@ -26,6 +27,25 @@ namespace Topshelf.Model.Shelving
             setup.ShadowCopyDirectories = "true";
 
             return AppDomain.CreateDomain(info.InferredName, null, setup);
+        }
+
+        public static AppDomain CreateNewAppDomain(IsolatedServiceInfo info)
+        {
+            var setup = AppDomain.CurrentDomain.SetupInformation;
+
+            setup.ShadowCopyFiles = "true";
+
+            if (!string.IsNullOrEmpty(info.PathToConfigurationFile))
+            {
+                setup.ConfigurationFile = info.PathToConfigurationFile;
+            }
+
+            if (info.Args != null)
+                setup.AppDomainInitializerArguments = info.Args;
+            if (info.ConfigureArgsAction != null)
+                setup.AppDomainInitializer = info.ConfigureArgsAction();
+
+            return AppDomain.CreateDomain(info.Name, null, setup);
         }
     }
 }

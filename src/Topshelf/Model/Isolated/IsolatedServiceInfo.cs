@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-//  
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -10,25 +10,15 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Model
+namespace Topshelf.Model.Isolated
 {
     using System;
 
-    public interface IServiceController :
-        IDisposable
+    public class IsolatedServiceInfo
     {
-        Type ServiceType { get; }
-        string Name { get; set; }
-        ServiceState State { get; }
-        ServiceBuilder BuildService { get; }
-
-        void Initialize();
-
-        void Start();
-        void Stop();
-        void Pause();
-        void Continue();
-
-        //dispose
+        public string Name { get; set; }
+        public string PathToConfigurationFile { get; set; }
+        public string[] Args { get; set; }
+        public Func<AppDomainInitializer> ConfigureArgsAction { get; set; }
     }
 }

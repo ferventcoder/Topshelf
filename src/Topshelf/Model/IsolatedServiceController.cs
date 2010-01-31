@@ -44,6 +44,11 @@ namespace Topshelf.Model
             set { _serviceController.Name = value; }
         }
 
+        public void Initialize()
+        {
+            
+        }
+
         public void Start()
         {
             _serviceController.Start();
@@ -74,6 +79,7 @@ namespace Topshelf.Model
             _serviceController.Name = value;
         }
 
+        public SerializableActions<TService> Actions { get; set; }
         public Action<TService> StartAction
         {
             get { return _serviceController.StartAction; }

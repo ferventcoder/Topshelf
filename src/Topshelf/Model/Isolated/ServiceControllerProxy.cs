@@ -10,73 +10,77 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Model.Shelving
+namespace Topshelf.Model.Isolated
 {
     using System;
-    using System.Diagnostics;
 
-    [DebuggerDisplay("Shelved")]
-    public class ShelvedServiceController :
+    public class ServiceControllerProxy :
+        MarshalByRefObject,
         IServiceController
     {
-        //this should be newed up in the remote app domain
-        ShelvedAppDomainManager _manager = null;
-        public string PathToConfigurationFile { get; set; }
-        AppDomain _domain;
+        readonly IServiceControllerOf<object> _target;
 
-        public string[] Args { get; set; }
+
+        public ServiceControllerProxy(Type type)
+        {
+            var targetType = typeof(IsolatedServiceControllerWrapper<>).MakeGenericType(type);
+            _target = (IServiceControllerOf<object>) Activator.CreateInstance(targetType);
+            Actions = new SerializableActions<object>();
+        }
+
+        public SerializableActions<object> Actions { get; private set; }
 
         #region IServiceController Members
 
         public void Initialize()
         {
-            _manager = (ShelvedAppDomainManager) _domain.CreateInstanceAndUnwrap("", "");
+            
         }
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <filterpriority>2</filterpriority>
         public void Dispose()
         {
-            //no-op
+            _target.Dispose();
         }
 
         public Type ServiceType
         {
-            get { throw new NotImplementedException(); }
+            get { return _target.ServiceType; }
         }
 
-        public string Name { get; set; }
+        public string Name
+        {
+            get { return _target.Name; }
+            set { _target.Name = value; }
+        }
 
         public ServiceState State
         {
-            get { return _manager.State; }
-        }
-
-        public ServiceBuilder BuildService
-        {
-            get { throw new NotImplementedException(); }
+            get { return _target.State; }
         }
 
         public void Start()
         {
-            _manager.Start();
+            _target.Start();
         }
 
         public void Stop()
         {
-            _manager.Stop();
+            _target.Stop();
         }
 
         public void Pause()
         {
-            _manager.Pause();
+            _target.Pause();
         }
 
         public void Continue()
         {
-            _manager.Continue();
+            _target.Continue();
+        }
+
+        public ServiceBuilder BuildService
+        {
+            get { return _target.BuildService; }
         }
 
         #endregion

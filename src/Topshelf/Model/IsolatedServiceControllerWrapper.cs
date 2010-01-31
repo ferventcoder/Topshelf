@@ -17,10 +17,21 @@ namespace Topshelf.Model
     public class IsolatedServiceControllerWrapper<TService> :
         IServiceControllerOf<object> where TService : class
     {
-        readonly ServiceController<TService> _target = new ServiceController<TService>();
+        readonly ServiceController<TService> _target;
+
+        public IsolatedServiceControllerWrapper()
+        {
+            _target = new ServiceController<TService>();
+            Actions = new SerializableActions<object>();
+            
+        }
 
         #region IServiceControllerOf<object> Members
 
+        public void Initialize()
+        {
+            
+        }
         public void Dispose()
         {
             _target.Dispose();
@@ -61,6 +72,8 @@ namespace Topshelf.Model
         {
             _target.Continue();
         }
+
+        public SerializableActions<object> Actions { get; set; }
 
         public Action<object> StartAction
         {

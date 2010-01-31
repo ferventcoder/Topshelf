@@ -74,6 +74,7 @@
     <Compile Include="Configuration\Dsl\ServiceConfiguratorBase.cs" />
     <Compile Include="Exceptions\CouldntBuildServiceException.cs" />
     <Compile Include="Model\Extensions.cs" />
+    <Compile Include="Model\Isolated\IsolatedServiceInfo.cs" />
     <Compile Include="Model\Shelving\AppDomainFactory.cs" />
     <Compile Include="Model\Shelving\ShelvedAppDomainManager.cs" />
     <Compile Include="Model\Shelving\ShelvedServiceController.cs" />
@@ -81,12 +82,12 @@
     <Compile Include="Model\Shelving\ShelvedServiceInfo.cs" />
     <Compile Include="TopshelfDispatcher.cs" />
     <Compile Include="Model\ControllerDelegates.cs" />
-    <Compile Include="Model\IServiceControllerOf.cs" />
+    <Compile Include="Model\Isolated\IServiceControllerOf.cs" />
     <Compile Include="Model\IsolatedServiceController.cs" />
-    <Compile Include="Model\FacadeToIsolatedServiceController.cs" />
+    <Compile Include="Model\Isolated\FacadeToIsolatedServiceController.cs" />
     <Compile Include="Configuration\RunConfiguration.cs" />
     <Compile Include="Model\IsolatedServiceControllerWrapper.cs" />
-    <Compile Include="Model\ServiceControllerProxy.cs" />
+    <Compile Include="Model\Isolated\ServiceControllerProxy.cs" />
     <Compile Include="Model\ServiceCoordinator.cs" />
     <Compile Include="Configuration\Dsl\RunnerConfigurator.cs" />
     <Compile Include="Model\IServiceCoordinator.cs" />
