@@ -81,12 +81,12 @@
     <Compile Include="Model\ServiceBuilder.cs" />
     <Compile Include="Model\Shelving\ShelvedServiceInfo.cs" />
     <Compile Include="TopshelfDispatcher.cs" />
-    <Compile Include="Model\ControllerDelegates.cs" />
+    <Compile Include="Model\Isolated\ControllerDelegates.cs" />
     <Compile Include="Model\Isolated\IServiceControllerOf.cs" />
-    <Compile Include="Model\IsolatedServiceController.cs" />
+    <Compile Include="Model\Isolated\IsolatedServiceController.cs" />
     <Compile Include="Model\Isolated\FacadeToIsolatedServiceController.cs" />
     <Compile Include="Configuration\RunConfiguration.cs" />
-    <Compile Include="Model\IsolatedServiceControllerWrapper.cs" />
+    <Compile Include="Model\Isolated\IsolatedServiceControllerWrapper.cs" />
     <Compile Include="Model\Isolated\ServiceControllerProxy.cs" />
     <Compile Include="Model\ServiceCoordinator.cs" />
     <Compile Include="Configuration\Dsl\RunnerConfigurator.cs" />
