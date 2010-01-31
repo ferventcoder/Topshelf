@@ -10,18 +10,20 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Model
+namespace Topshelf.Model.Shelving
 {
     using System;
     using System.Diagnostics;
-    using Shelving;
 
     [DebuggerDisplay("Shelved")]
     public class ShelvedServiceController :
         IServiceController
     {
         //this should be newed up in the remote app domain
-        Shelving.ShelvedAppDomainManager _manager = new ShelvedAppDomainManager();
+        readonly ShelvedAppDomainManager _manager = new ShelvedAppDomainManager();
+        public string PathToConfigurationFile { get; set; }
+
+        public string[] Args { get; set; }
 
         #region IServiceController Members
 
@@ -50,10 +52,6 @@ namespace Topshelf.Model
         {
             get { throw new NotImplementedException(); }
         }
-
-        public string PathToConfigurationFile { get; set; }
-
-        public string[] Args { get; set; }
 
         public void Start()
         {

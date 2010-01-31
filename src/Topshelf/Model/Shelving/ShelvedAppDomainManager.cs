@@ -14,31 +14,64 @@ namespace Topshelf.Model.Shelving
 {
     using System;
 
+    [Serializable]
     public class ShelvedAppDomainManager
     {
+        readonly IServiceController _controller;
+
+        public ShelvedAppDomainManager()
+        {
+            Bootstrapper bootstrapper = null;
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if(typeof(Bootstrapper).IsAssignableFrom(type))
+                    {
+                        bootstrapper = (Bootstrapper)Activator.CreateInstance(type);
+                        break;
+                    }
+                }
+            }
+
+            _controller = (IServiceController)typeof(ServiceController<>).MakeGenericType(bootstrapper.ServiceType);
+            
+        }
+
         public void Start()
         {
-            
+            _controller.Start();
         }
 
         public void Stop()
         {
-            
+            _controller.Stop();
         }
 
         public void Pause()
         {
-            
+            _controller.Pause();
         }
 
         public void Continue()
         {
-            
+            _controller.Continue();
+        }
+
+        public string Name
+        {
+            get { return _controller.Name; }
         }
 
         public ServiceState State
         {
-            get { throw new NotImplementedException(); }
+            get { return _controller.State; }
         }
+    }
+
+    public interface Bootstrapper
+    {
+        Type ServiceType { get; }
+        object BuildService();
     }
 }

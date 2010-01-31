@@ -15,6 +15,7 @@ namespace Topshelf.Configuration.Dsl
     using System;
     using System.IO;
     using Model;
+    using Model.Shelving;
 
     public class ShelvedServiceConfigurator :
         IShelvedServiceConfigurator
