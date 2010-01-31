@@ -10,12 +10,35 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Configuration.Dsl
+namespace Topshelf.Model.Shelving
 {
-    public interface IShelvedServiceConfigurator
+    using System;
+
+    public class ShelvedAppDomainManager
     {
-        void PathToPrivateBin(string pathToPrivateBin);
-        void SetName(string name);
-        void CommandLineArguments(string[] args);
+        public void Start()
+        {
+            
+        }
+
+        public void Stop()
+        {
+            
+        }
+
+        public void Pause()
+        {
+            
+        }
+
+        public void Continue()
+        {
+            
+        }
+
+        public ServiceState State
+        {
+            get { throw new NotImplementedException(); }
+        }
     }
 }

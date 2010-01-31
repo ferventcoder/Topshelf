@@ -10,19 +10,19 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Shelving
+namespace Topshelf.Model.Shelving
 {
-    using System;
     using System.IO;
 
-    public class SubFolder
+    public class ShelvedServiceInfo
     {
-        string _fullPath;
-        string _inferredName;
+        readonly string _fullPath;
+        readonly string _inferredName;
 
-        public SubFolder(string inferredName)
+        public ShelvedServiceInfo(string path)
         {
-            _inferredName = inferredName;
+            _inferredName = new DirectoryInfo(path).Name;
+            _fullPath = new DirectoryInfo(path).FullName;
         }
 
         public string InferredName
@@ -30,9 +30,12 @@ namespace Shelving
             get { return _inferredName; }
         }
 
-        public string FullPath()
+        public string FullPath
         {
-            return Path.GetFullPath(_inferredName);
+            get
+            {
+                return _fullPath;
+            }
         }
     }
 }

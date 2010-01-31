@@ -20,11 +20,12 @@ namespace Shelving
     using log4net;
     using Topshelf;
     using Topshelf.Configuration.Dsl;
+    using Topshelf.Model.Shelving;
 
     internal class Program
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(Program));
-        static IList<SubFolder> _subFolders;
+        static IList<ShelvedServiceInfo> _subFolders;
         static Config _config = new DefaultConfiguration();
 
         static Dictionary<RunAs, Action<IRunnerConfigurator>> _runas = new Dictionary<RunAs, Action<IRunnerConfigurator>>()
@@ -53,9 +54,13 @@ namespace Shelving
                 foreach (var subFolder in _subFolders)
                 {
                     _log.InfoFormat("Configuring service '{0}' for shelving", subFolder.InferredName);
+
+                    ShelvedServiceInfo folder = subFolder;
                     c.ConfigureServiceInShelving(sc =>
                     {
-                        sc.PathToPrivateBin(subFolder.FullPath());
+                        sc.SetName(folder.InferredName);
+                        sc.CommandLineArguments(args);
+                        sc.PathToPrivateBin(folder.FullPath);
                     });
 
                 }
@@ -64,13 +69,13 @@ namespace Shelving
             Runner.Host(cfg, args);
         }
 
-        static IList<SubFolder> CollectSubFolders()
+        static IList<ShelvedServiceInfo> CollectSubFolders()
         {
             return Directory.GetDirectories(_config.ServicesDirectory).Select(s =>
             {
                 var name = new DirectoryInfo(s).Name;
                 _log.DebugFormat("Found service '{0}'", name);
-                return new SubFolder(s);
+                return new ShelvedServiceInfo(s);
             }).ToList();
         }
 

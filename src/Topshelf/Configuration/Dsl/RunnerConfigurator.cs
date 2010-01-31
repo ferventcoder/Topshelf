@@ -170,6 +170,20 @@ namespace Topshelf.Configuration.Dsl
             });
         }
 
+        /// <summary>
+        /// Configures a service using a completely separate appdomain and a completely different private bin folder
+        /// </summary>
+        /// <param name="action">The configuration action or set of configuration actions that will be performed.</param>
+        public void ConfigureServiceInShelving(Action<IShelvedServiceConfigurator> action)
+        {
+            var configurator = new ShelvedServiceConfigurator();
+            _serviceConfigurators.Add(()=>
+            {
+                action(configurator);
+                return configurator.Create();
+            });
+        }
+
         public void BeforeStartingServices(Action<IServiceCoordinator> action)
         {
             _beforeStartingServices = action;

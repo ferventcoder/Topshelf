@@ -10,12 +10,22 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Configuration.Dsl
+namespace Topshelf.Model.Shelving
 {
-    public interface IShelvedServiceConfigurator
+    using System;
+
+    public class AppDomainFactory
     {
-        void PathToPrivateBin(string pathToPrivateBin);
-        void SetName(string name);
-        void CommandLineArguments(string[] args);
+        public AppDomain CreateNewAppDomain(ShelvedServiceInfo info)
+        {
+            var setup = AppDomain.CurrentDomain.SetupInformation;
+            setup.PrivateBinPath = info.FullPath;
+            setup.ApplicationBase = info.FullPath;
+
+            setup.ShadowCopyFiles = "true";
+            setup.ShadowCopyDirectories = "true";
+
+            return AppDomain.CreateDomain(info.InferredName, null, setup);
+        }
     }
 }
