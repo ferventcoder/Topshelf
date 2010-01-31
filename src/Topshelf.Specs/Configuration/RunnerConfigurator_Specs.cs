@@ -135,7 +135,7 @@ namespace Topshelf.Specs.Configuration
 				x.ConfigureService<TestService>(c => c.Named(serviceName));
 			});
 
-			var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
+			var serviceInfo = runConfiguration.Coordinator.GetServiceInformation();
 
 			serviceInfo[0].Name.ShouldEqual(serviceName);
 		}
@@ -145,7 +145,7 @@ namespace Topshelf.Specs.Configuration
 		{
 			var runConfiguration = RunnerConfigurator.New(x => x.ConfigureService<TestService>(c => { }));
 
-			var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
+			var serviceInfo = runConfiguration.Coordinator.GetServiceInformation();
 
 			serviceInfo[0].Name.ShouldNotBeNull();
 		}
@@ -159,7 +159,7 @@ namespace Topshelf.Specs.Configuration
     			x.ConfigureService<TestService>(c => { });
     		});
             
-    		var serviceInfo = runConfiguration.Coordinator.GetServiceInfo();
+    		var serviceInfo = runConfiguration.Coordinator.GetServiceInformation();
             
 			serviceInfo[0].Name.ShouldNotEqual(serviceInfo[1].Name);
      	}

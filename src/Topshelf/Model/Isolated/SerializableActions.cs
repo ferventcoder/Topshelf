@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-//  
+// 
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,9 +12,15 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model.Isolated
 {
-    public interface IServiceControllerOf<TService> : 
-        IServiceController
+    using System;
+
+    [Serializable]
+    public class SerializableActions<TService>
     {
-        SerializableActions<TService> Actions { get; }
+        public Action<TService> StartAction { get; set; }
+        public Action<TService> StopAction { get; set; }
+        public Action<TService> PauseAction { get; set; }
+        public Action<TService> ContinueAction { get; set; }
+        public Func<ServiceBuilder> BuildServiceAction { get; set; }
     }
 }

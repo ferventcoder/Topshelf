@@ -23,17 +23,15 @@ namespace Topshelf.Model
         void Pause();
         void Continue();
 
+        IServiceController GetService(string name);
+
         void StartService(string name);
         void StopService(string name);
         void PauseService(string name);
         void ContinueService(string name);
 
-        //void Install();
-        //void Uninstall();
-
         event Action Stopped;
         int HostedServiceCount { get; }
-        IServiceController GetService(string s);
-        IList<ServiceInformation> GetServiceInfo();
+        IList<ServiceInformation> GetServiceInformation();
     }
 }

@@ -17,7 +17,6 @@ namespace Topshelf.Model
     using System.Diagnostics;
     using System.Linq;
     using log4net;
-    using Magnum.Collections;
 
     [DebuggerDisplay("Hosting {HostedServiceCount} Services")]
     public class ServiceCoordinator :
@@ -156,7 +155,7 @@ namespace Topshelf.Model
             get { return Services.Count; }
         }
 
-    	public IList<ServiceInformation> GetServiceInfo()
+    	public IList<ServiceInformation> GetServiceInformation()
         {
             var result = new List<ServiceInformation>();
 
