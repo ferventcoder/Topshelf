@@ -9,7 +9,8 @@ namespace Shelving.Configuration
     public enum RunAs
     {
         LocalSystem,
-        NetworkSystem,
-        Interactive
+        NetworkService,
+        Interactive,
+        LocalService
     }
 }

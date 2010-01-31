@@ -35,6 +35,16 @@ namespace Topshelf.Configuration
             get { return new Credentials("", "", ServiceAccount.LocalSystem); }
         }
 
+        public static Credentials NetworkService
+        {
+            get { return new Credentials("", "", ServiceAccount.NetworkService); }
+        }
+
+        public static Credentials LocalService
+        {
+            get { return new Credentials("", "", ServiceAccount.LocalService); }
+        }
+
         public static Credentials Interactive
         {
             get { return new Credentials(null, null, ServiceAccount.User); }

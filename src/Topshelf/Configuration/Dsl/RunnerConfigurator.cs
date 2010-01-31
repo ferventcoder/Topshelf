@@ -297,6 +297,22 @@ namespace Topshelf.Configuration.Dsl
         }
 
         /// <summary>
+        /// The application will run with the Local Service credentials.
+        /// </summary>
+        public void RunAsLocalService()
+        {
+            _credentials = Credentials.LocalService;
+        }
+
+        /// <summary>
+        /// The application will run with the Network Service credentials.
+        /// </summary>
+        public void RunAsNetworkService()
+        {
+            _credentials = Credentials.NetworkService;
+        }
+
+        /// <summary>
         /// The application will run with the Local System credentials, with the ability to interact with the desktop.
         /// </summary>
         public void RunAsFromInteractive()

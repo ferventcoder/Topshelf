@@ -34,7 +34,7 @@ namespace Topshelf.Configuration.Dsl
             _pathToConfigurationFile = Path.Combine(_pathToPrivateBin, "{0}.config".FormatWith(_name));
         }
 
-        public void SetName(string name)
+        public void Named(string name)
         {
             _name = name;
         }

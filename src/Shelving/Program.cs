@@ -25,13 +25,15 @@ namespace Shelving
     internal class Program
     {
         static readonly ILog _log = LogManager.GetLogger(typeof(Program));
-        static IList<ShelvedServiceInfo> _subFolders;
+        static IList<ShelvedServiceInfo> _shelvedServiceInfo;
         static Config _config = new DefaultConfiguration();
 
         static Dictionary<RunAs, Action<IRunnerConfigurator>> _runas = new Dictionary<RunAs, Action<IRunnerConfigurator>>()
                                                                        {
                                                                            {RunAs.Interactive, c => c.RunAsFromInteractive()},
-                                                                           {RunAs.LocalSystem, c => c.RunAsLocalSystem()}
+                                                                           {RunAs.LocalSystem, c => c.RunAsLocalSystem()},
+                                                                           {RunAs.NetworkService, c=>c.RunAsNetworkService()},
+                                                                           {RunAs.LocalService, c=>c.RunAsLocalService()}
                                                                        };
 
         static void Main(string[] args)
@@ -39,8 +41,8 @@ namespace Shelving
             log4net.Config.BasicConfigurator.Configure();
 
             EnsureServicesDirectoryExists();
-            _subFolders = CollectSubFolders();
-            _log.DebugFormat("Found '{0}' services", _subFolders.Count);
+            _shelvedServiceInfo = CollectSubFolders();
+            _log.DebugFormat("Found '{0}' services", _shelvedServiceInfo.Count);
 
             //register app domain?  
             var cfg = RunnerConfigurator.New(c =>
@@ -51,16 +53,16 @@ namespace Shelving
 
                 _runas[_config.HowToRun](c);
 
-                foreach (var subFolder in _subFolders)
+                foreach (var serviceInfo in _shelvedServiceInfo)
                 {
-                    _log.InfoFormat("Configuring service '{0}' for shelving", subFolder.InferredName);
+                    _log.InfoFormat("Configuring service '{0}' for shelving", serviceInfo.InferredName);
 
-                    ShelvedServiceInfo folder = subFolder;
+                    var info = serviceInfo;
                     c.ConfigureServiceInShelving(sc =>
                     {
-                        sc.SetName(folder.InferredName);
+                        sc.Named(info.InferredName);
                         sc.CommandLineArguments(args);
-                        sc.PathToPrivateBin(folder.FullPath);
+                        sc.PathToPrivateBin(info.FullPath);
                     });
 
                 }

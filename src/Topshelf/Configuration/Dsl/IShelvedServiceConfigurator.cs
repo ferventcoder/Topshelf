@@ -15,7 +15,7 @@ namespace Topshelf.Configuration.Dsl
     public interface IShelvedServiceConfigurator
     {
         void PathToPrivateBin(string pathToPrivateBin);
-        void SetName(string name);
+        void Named(string name);
         void CommandLineArguments(string[] args);
     }
 }

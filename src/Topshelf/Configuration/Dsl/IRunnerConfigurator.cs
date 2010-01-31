@@ -84,6 +84,16 @@ namespace Topshelf.Configuration.Dsl
         void RunAsLocalSystem();
 
         /// <summary>
+        /// The application will run with the Local Service credentials.
+        /// </summary>
+        void RunAsLocalService();
+
+        /// <summary>
+        /// The application will run with the Network Service credentials.
+        /// </summary>
+        void RunAsNetworkService();
+
+        /// <summary>
         /// The application will run with the specified credentials.
         /// </summary>
         /// <remarks>
