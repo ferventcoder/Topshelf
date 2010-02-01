@@ -13,7 +13,7 @@
 namespace Topshelf.Model.Isolated
 {
     public interface IServiceControllerOf<TService> : 
-        IServiceController
+        IServiceController where TService : class
     {
         SerializableActions<TService> Actions { get; }
     }

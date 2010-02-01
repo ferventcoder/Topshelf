@@ -81,7 +81,6 @@
     <Compile Include="Model\ServiceBuilder.cs" />
     <Compile Include="Model\Shelving\ShelvedServiceInfo.cs" />
     <Compile Include="TopshelfDispatcher.cs" />
-    <Compile Include="Model\Isolated\ControllerDelegates.cs" />
     <Compile Include="Model\Isolated\IServiceControllerOf.cs" />
     <Compile Include="Model\Isolated\IsolatedServiceController.cs" />
     <Compile Include="Model\Isolated\FacadeToIsolatedServiceController.cs" />

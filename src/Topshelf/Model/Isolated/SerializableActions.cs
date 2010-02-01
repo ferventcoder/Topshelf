@@ -15,7 +15,7 @@ namespace Topshelf.Model.Isolated
     using System;
 
     [Serializable]
-    public class SerializableActions<TService>
+    public class SerializableActions<TService> where TService : class
     {
         public Action<TService> StartAction { get; set; }
         public Action<TService> StopAction { get; set; }

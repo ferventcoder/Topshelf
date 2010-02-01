@@ -25,7 +25,7 @@ namespace Topshelf.Model
     {
         private AppDomain _domain;
         private ServiceControllerProxy _remoteServiceController;
-        private ControllerDelegates<TService> _delegates = new ControllerDelegates<TService>();
+        private SerializableActions<TService> _delegates = new SerializableActions<TService>();
 
         public void Initialize()
         {
@@ -47,24 +47,29 @@ namespace Topshelf.Model
             if (_remoteServiceController == null)
                 throw new ApplicationException("Unable to create service proxy for " + typeof(TService).Name);
 
-            _remoteServiceController.Actions.StartAction = _delegates.StartActionObject;
-            _remoteServiceController.Actions.StopAction = _delegates.StopActionObject;
-            _remoteServiceController.Actions.PauseAction = _delegates.PauseActionObject;
-            _remoteServiceController.Actions.ContinueAction = _delegates.ContinueActionObject;
-            _remoteServiceController.Actions.BuildServiceAction = ()=>_delegates.BuildServiceObject;
+            _remoteServiceController.Actions.StartAction = ConvertForUseWithAnObject(_delegates.StartAction);
+            _remoteServiceController.Actions.StopAction = ConvertForUseWithAnObject(_delegates.StopAction);
+            _remoteServiceController.Actions.PauseAction = ConvertForUseWithAnObject(_delegates.PauseAction);
+            _remoteServiceController.Actions.ContinueAction = ConvertForUseWithAnObject(_delegates.ContinueAction);
+            _remoteServiceController.Actions.BuildServiceAction = _delegates.BuildServiceAction;
             
             _remoteServiceController.Name = Name;
 
             _remoteServiceController.Start();
         }
 
+        private static Action<object> ConvertForUseWithAnObject(Action<TService> action)
+        {
+            return o => action((TService) o);
+        }
+
         //figure out a way to get rid of these?
-        public ControllerDelegates<TService> Delegates { get { return _delegates; } }
+        public SerializableActions<TService> Delegates { get { return _delegates; } }
         public Action<TService> StartAction { set { _delegates.StartAction = value; } }
         public Action<TService> StopAction { set { _delegates.StopAction = value; } }
         public Action<TService> PauseAction { set { _delegates.PauseAction = value; } }
         public Action<TService> ContinueAction { set { _delegates.ContinueAction = value; } }
-        public ServiceBuilder BuildAction { set { _delegates.BuildAction = value; } }
+        public ServiceBuilder BuildAction { set { _delegates.BuildServiceAction = ()=>value; } }
         public string Name { get; set; }
         public string PathToConfigurationFile { get; set; }
         public string[] Args { get; set; }

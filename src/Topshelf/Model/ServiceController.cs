@@ -75,7 +75,7 @@ namespace Topshelf.Model
         public Action<TService> ContinueAction { get; set; }
         public ServiceBuilder BuildService { get; set; }
 
-        #region Dispose Shit
+        #region IDisposable
 
         bool _disposed;
 
@@ -151,7 +151,6 @@ namespace Topshelf.Model
 
         void BuildInstance()
         {
-            //TODO: do I need to pull it out by name?
             _instance = (TService)BuildService(Name);
             if (_instance == null) throw new CouldntBuildServiceException(Name, typeof(TService));
         }
