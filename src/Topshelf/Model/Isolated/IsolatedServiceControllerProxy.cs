@@ -14,73 +14,72 @@ namespace Topshelf.Model.Isolated
 {
     using System;
 
-    public class ServiceControllerProxy :
+    //this class is remoted accross, and should delegate actions to the real service controller
+    public class IsolatedServiceControllerProxy :
         MarshalByRefObject,
         IServiceController
     {
-        readonly IServiceControllerOf<object> _target;
+        readonly IServiceController _wrappedServiceController;
 
-
-        public ServiceControllerProxy(Type type)
+        public IsolatedServiceControllerProxy(Type type, SerializableActions<object> actions)
         {
-            var targetType = typeof(IsolatedServiceControllerWrapper<>).MakeGenericType(type);
-            _target = (IServiceControllerOf<object>) Activator.CreateInstance(targetType);
-            Actions = new SerializableActions<object>();
+            Actions = actions;
+            _wrappedServiceController = (IServiceController)typeof(ServiceController<>).MakeGenericType(type);
+            //TODO: how to set actions on wrapped service controller
         }
 
-        public SerializableActions<object> Actions { get; private set; }
-
+        public SerializableActions<object> Actions { get; set; }
         #region IServiceController Members
 
         public void Initialize()
         {
-            
+            _wrappedServiceController.Initialize();
         }
 
         public void Dispose()
         {
-            _target.Dispose();
+            _wrappedServiceController.Dispose();
         }
 
         public Type ServiceType
         {
-            get { return _target.ServiceType; }
+            get { return _wrappedServiceController.ServiceType; }
         }
 
         public string Name
         {
-            get { return _target.Name; }
-            set { _target.Name = value; }
+            get { return _wrappedServiceController.Name; }
+            set { _wrappedServiceController.Name = value; }
         }
 
         public ServiceState State
         {
-            get { return _target.State; }
+            get { return _wrappedServiceController.State; }
         }
 
         public void Start()
         {
-            _target.Start();
+            _wrappedServiceController.Start();
         }
 
         public void Stop()
         {
-            _target.Stop();
+            _wrappedServiceController.Stop();
         }
 
         public void Pause()
         {
-            _target.Pause();
+            _wrappedServiceController.Pause();
         }
 
         public void Continue()
         {
-            _target.Continue();
+            _wrappedServiceController.Continue();
         }
 
         public ServiceBuilder BuildService
         {
-            get { return _target.BuildService; }
+            get { return _wrappedServiceController.BuildService; }
         }
 
         #endregion

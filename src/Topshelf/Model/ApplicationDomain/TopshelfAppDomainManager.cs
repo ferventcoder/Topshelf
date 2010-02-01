@@ -10,17 +10,13 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Model.Isolated
+namespace Topshelf.Model.ApplicationDomain
 {
     using System;
 
-    public class IsolatedServiceInfo
+    public class TopshelfAppDomainManager :
+        AppDomainManager
     {
-        public string Name { get; set; }
-        public string PathToConfigurationFile { get; set; }
-        public string[] Args { get; set; }
-        public Func<AppDomainInitializer> ConfigureArgsAction { get; set; }
-        public SerializableActions<object> Actions { get; set; }
-        public Type Type { get; set; }
+
     }
 }

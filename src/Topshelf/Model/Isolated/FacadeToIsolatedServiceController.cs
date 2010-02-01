@@ -10,12 +10,11 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Model
+namespace Topshelf.Model.Isolated
 {
     using System;
     using System.Diagnostics;
-    using Isolated;
-    using Shelving;
+    using ApplicationDomain;
 
     [Serializable]
     [DebuggerDisplay("Isolated Service({Name}) - {State}")]
@@ -23,8 +22,8 @@ namespace Topshelf.Model
         IServiceController
         where TService : class
     {
-        private AppDomain _domain;
-        private ServiceControllerProxy _remoteServiceController;
+        private AppDomainBundle _domain;
+        private IsolatedServiceControllerProxy _remoteIsolatedServiceController;
         private SerializableActions<TService> _delegates = new SerializableActions<TService>();
 
         public void Initialize()
@@ -41,21 +40,21 @@ namespace Topshelf.Model
                                                               PathToConfigurationFile = this.PathToConfigurationFile
                                                           });
 
-            var type = typeof(ServiceControllerProxy);
-            _remoteServiceController = (ServiceControllerProxy)_domain.CreateInstanceAndUnwrap(type.Assembly.GetName().FullName, type.FullName, true, 0, null, new object[]{ typeof(TService)}, null, null, null);
+            var type = typeof(IsolatedServiceControllerProxy);
+            _remoteIsolatedServiceController = (IsolatedServiceControllerProxy)_domain.Domain.CreateInstanceAndUnwrap(type.Assembly.GetName().FullName, type.FullName, true, 0, null, new object[]{ typeof(TService)}, null, null, null);
 
-            if (_remoteServiceController == null)
+            if (_remoteIsolatedServiceController == null)
                 throw new ApplicationException("Unable to create service proxy for " + typeof(TService).Name);
 
-            _remoteServiceController.Actions.StartAction = ConvertForUseWithAnObject(_delegates.StartAction);
-            _remoteServiceController.Actions.StopAction = ConvertForUseWithAnObject(_delegates.StopAction);
-            _remoteServiceController.Actions.PauseAction = ConvertForUseWithAnObject(_delegates.PauseAction);
-            _remoteServiceController.Actions.ContinueAction = ConvertForUseWithAnObject(_delegates.ContinueAction);
-            _remoteServiceController.Actions.BuildServiceAction = _delegates.BuildServiceAction;
+            _remoteIsolatedServiceController.Actions.StartAction = ConvertForUseWithAnObject(_delegates.StartAction);
+            _remoteIsolatedServiceController.Actions.StopAction = ConvertForUseWithAnObject(_delegates.StopAction);
+            _remoteIsolatedServiceController.Actions.PauseAction = ConvertForUseWithAnObject(_delegates.PauseAction);
+            _remoteIsolatedServiceController.Actions.ContinueAction = ConvertForUseWithAnObject(_delegates.ContinueAction);
+            _remoteIsolatedServiceController.Actions.BuildServiceAction = _delegates.BuildServiceAction;
             
-            _remoteServiceController.Name = Name;
+            _remoteIsolatedServiceController.Name = Name;
 
-            _remoteServiceController.Start();
+            _remoteIsolatedServiceController.Start();
         }
 
         private static Action<object> ConvertForUseWithAnObject(Action<TService> action)
@@ -77,26 +76,26 @@ namespace Topshelf.Model
 
         public void Stop()
         {
-            _remoteServiceController.IfNotNull(x => x.Stop());
+            _remoteIsolatedServiceController.IfNotNull(x => x.Stop());
 
-            AppDomain.Unload(_domain);
+            _domain.Dispose();
         }
 
         public void Pause()
         {
-            _remoteServiceController.IfNotNull(x => x.Pause());
+            _remoteIsolatedServiceController.IfNotNull(x => x.Pause());
         }
 
         public void Continue()
         {
-            _remoteServiceController.IfNotNull(x => x.Continue());
+            _remoteIsolatedServiceController.IfNotNull(x => x.Continue());
         }
 
         public ServiceBuilder BuildService
         {
             get
             {
-                return _remoteServiceController.IfNotNull<ServiceBuilder>(x => x.BuildService, s => new object());
+                return _remoteIsolatedServiceController.IfNotNull<ServiceBuilder>(x => x.BuildService, s => new object());
             }
         }
 
@@ -107,12 +106,12 @@ namespace Topshelf.Model
 
         public Type ServiceType
         {
-            get { return _remoteServiceController.IfNotNull(x => x.ServiceType, typeof(object)); }
+            get { return _remoteIsolatedServiceController.IfNotNull(x => x.ServiceType, typeof(object)); }
         }
 
         public ServiceState State
         {
-            get { return _remoteServiceController.IfNotNull(x => x.State, ServiceState.Stopped); }
+            get { return _remoteIsolatedServiceController.IfNotNull(x => x.State, ServiceState.Stopped); }
         }
     }
 }

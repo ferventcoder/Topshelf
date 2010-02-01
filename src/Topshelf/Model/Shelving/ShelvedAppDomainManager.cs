@@ -14,9 +14,8 @@ namespace Topshelf.Model.Shelving
 {
     using System;
 
-    [Serializable]
     public class ShelvedAppDomainManager :
-        MarshalByRefObject
+        AppDomainManager
     {
         readonly IServiceController _controller;
 
@@ -68,11 +67,5 @@ namespace Topshelf.Model.Shelving
         {
             get { return _controller.State; }
         }
-    }
-
-    public interface Bootstrapper
-    {
-        Type ServiceType { get; }
-        object BuildService();
     }
 }

@@ -14,6 +14,7 @@ namespace Topshelf.Configuration.Dsl
 {
     using System;
     using Model;
+    using Model.Isolated;
 
     public class IsolatedServiceConfigurator<TService> :
         ServiceConfiguratorBase<TService>,

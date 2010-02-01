@@ -73,11 +73,14 @@
     <Compile Include="Configuration\Dsl\IsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfiguratorBase.cs" />
     <Compile Include="Exceptions\CouldntBuildServiceException.cs" />
+    <Compile Include="Model\ApplicationDomain\AppDomainBundle.cs" />
+    <Compile Include="Model\ApplicationDomain\TopshelfAppDomainManager.cs" />
     <Compile Include="Model\Isolated\IsolatedServiceInfo.cs" />
     <Compile Include="Model\Isolated\SerializableActions.cs" />
-    <Compile Include="Model\Shelving\AppDomainFactory.cs" />
+    <Compile Include="Model\ApplicationDomain\AppDomainFactory.cs" />
+    <Compile Include="Model\Shelving\Bootstrapper.cs" />
     <Compile Include="Model\Shelving\ShelvedAppDomainManager.cs" />
-    <Compile Include="Model\Shelving\ShelvedServiceController.cs" />
+    <Compile Include="Model\Shelving\ShelvedServiceControllerProxy.cs" />
     <Compile Include="Model\ServiceBuilder.cs" />
     <Compile Include="Model\Shelving\ShelvedServiceInfo.cs" />
     <Compile Include="TopshelfDispatcher.cs" />
@@ -85,8 +88,7 @@
     <Compile Include="Model\Isolated\IsolatedServiceController.cs" />
     <Compile Include="Model\Isolated\FacadeToIsolatedServiceController.cs" />
     <Compile Include="Configuration\RunConfiguration.cs" />
-    <Compile Include="Model\Isolated\IsolatedServiceControllerWrapper.cs" />
-    <Compile Include="Model\Isolated\ServiceControllerProxy.cs" />
+    <Compile Include="Model\Isolated\IsolatedServiceControllerProxy.cs" />
     <Compile Include="Model\ServiceCoordinator.cs" />
     <Compile Include="Configuration\Dsl\RunnerConfigurator.cs" />
     <Compile Include="Model\IServiceCoordinator.cs" />

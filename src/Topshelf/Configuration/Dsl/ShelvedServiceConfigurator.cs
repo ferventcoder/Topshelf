@@ -48,7 +48,7 @@ namespace Topshelf.Configuration.Dsl
 
         public IServiceController Create()
         {
-            IServiceController serviceController = new ShelvedServiceController
+            IServiceController serviceController = new ShelvedServiceControllerProxy
                                                    {
                                                        Name = _name,
                                                        PathToConfigurationFile = _pathToConfigurationFile,

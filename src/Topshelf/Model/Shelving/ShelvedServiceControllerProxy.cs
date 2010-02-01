@@ -16,7 +16,7 @@ namespace Topshelf.Model.Shelving
     using System.Diagnostics;
 
     [DebuggerDisplay("Shelved")]
-    public class ShelvedServiceController :
+    public class ShelvedServiceControllerProxy :
         IServiceController
     {
         //this should be newed up in the remote app domain

@@ -10,14 +10,16 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Model.Shelving
+namespace Topshelf.Model.ApplicationDomain
 {
     using System;
+    using System.Reflection;
     using Isolated;
+    using Shelving;
 
     public class AppDomainFactory
     {
-        public static AppDomain CreateNewAppDomain(ShelvedServiceInfo info)
+        public static AppDomainBundle CreateNewAppDomain(ShelvedServiceInfo info)
         {
             var setup = AppDomain.CurrentDomain.SetupInformation;
             setup.PrivateBinPath = info.FullPath;
@@ -26,10 +28,12 @@ namespace Topshelf.Model.Shelving
             setup.ShadowCopyFiles = "true";
             setup.ShadowCopyDirectories = "true";
 
-            return AppDomain.CreateDomain(info.InferredName, null, setup);
+            var domain = AppDomain.CreateDomain(info.InferredName, null, setup);
+            var mgr = (TopshelfAppDomainManager)domain.CreateInstanceAndUnwrap("", "");
+            return new AppDomainBundle(domain, mgr);
         }
 
-        public static AppDomain CreateNewAppDomain(IsolatedServiceInfo info)
+        public static AppDomainBundle CreateNewAppDomain(IsolatedServiceInfo info)
         {
             var setup = AppDomain.CurrentDomain.SetupInformation;
 
@@ -45,7 +49,10 @@ namespace Topshelf.Model.Shelving
             if (info.ConfigureArgsAction != null)
                 setup.AppDomainInitializer = info.ConfigureArgsAction();
 
-            return AppDomain.CreateDomain(info.Name, null, setup);
+            var domain = AppDomain.CreateDomain(info.Name, null, setup);
+            var args = new object[] {info.Type, info.Actions};
+            var mgr = (TopshelfAppDomainManager)domain.CreateInstanceAndUnwrap("", "", true, BindingFlags.Public, null, args,null, null, null);
+            return new AppDomainBundle(domain, mgr);
         }
     }
 }
