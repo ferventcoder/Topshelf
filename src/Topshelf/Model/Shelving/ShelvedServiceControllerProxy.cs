@@ -26,9 +26,7 @@ namespace Topshelf.Model.Shelving
 
         public string[] Args { get; set; }
 
-        #region IServiceController Members
-
-        public void Initialize()
+    	public void Initialize()
         {
             _manager = (ShelvedAppDomainManager) _domain.CreateInstanceAndUnwrap("", "");
         }
@@ -78,7 +76,5 @@ namespace Topshelf.Model.Shelving
         {
             _manager.Continue();
         }
-
-        #endregion
     }
 }

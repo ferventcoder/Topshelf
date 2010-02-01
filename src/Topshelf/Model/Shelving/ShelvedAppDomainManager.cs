@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,60 +12,89 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model.Shelving
 {
-    using System;
+	using System;
+	using System.Linq;
+	using System.Reflection;
 
-    public class ShelvedAppDomainManager :
-        AppDomainManager
-    {
-        readonly IServiceController _controller;
+	public class ShelvedAppDomainManager :
+		AppDomainManager,
+		IServiceController
+	{
+		readonly Bootstrapper _bootstrapper;
+		readonly IServiceController _controller;
 
-        public ShelvedAppDomainManager()
-        {
-            Bootstrapper bootstrapper = null;
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                foreach (var type in assembly.GetTypes())
-                {
-                    if(typeof(Bootstrapper).IsAssignableFrom(type))
-                    {
-                        bootstrapper = (Bootstrapper)Activator.CreateInstance(type);
-                        break;
-                    }
-                }
-            }
+		public ShelvedAppDomainManager(AssemblyName servicePath)
+		{
+			var assembly = AppDomain.CurrentDomain.Load(servicePath);
 
-            _controller = (IServiceController)typeof(ServiceController<>).MakeGenericType(bootstrapper.ServiceType);
-            
-        }
+			Type type = AppDomain.CurrentDomain.GetAssemblies()
+				.SelectMany(x => x.GetTypes())
+				.Where(x => x.IsInterface == false)
+				.Where(x => typeof(Bootstrapper).IsAssignableFrom(x))
+				.FirstOrDefault();
 
-        public void Start()
-        {
-            _controller.Start();
-        }
+			if (type == null)
+				throw new InvalidOperationException("The bootstrapper was not found.");
 
-        public void Stop()
-        {
-            _controller.Stop();
-        }
+			_bootstrapper = Activator.CreateInstance(type) as Bootstrapper;
+			if (_bootstrapper == null)
+				throw new InvalidOperationException("Unable to create the bootstrapper");
 
-        public void Pause()
-        {
-            _controller.Pause();
-        }
+			Type controllerType = typeof(ServiceController<>).MakeGenericType(_bootstrapper.ServiceType);
 
-        public void Continue()
-        {
-            _controller.Continue();
-        }
+			_controller = Activator.CreateInstance(controllerType) as IServiceController;
+		}
 
-        public string Name
-        {
-            get { return _controller.Name; }
-        }
+		public string Name
+		{
+			get { return _controller.Name; }
+		}
 
-        public ServiceState State
-        {
-            get { return _controller.State; }
-        }
-    }
+
+		public Type ServiceType
+		{
+			get { return _controller.ServiceType; }
+		}
+
+		string IServiceController.Name { get; set; }
+
+		public ServiceState State
+		{
+			get { return _controller.State; }
+		}
+
+		public ServiceBuilder BuildService
+		{
+			get { return _controller.BuildService; }
+		}
+
+		public void Initialize()
+		{
+			_controller.Initialize();
+		}
+
+		public void Start()
+		{
+			_controller.Start();
+		}
+
+		public void Stop()
+		{
+			_controller.Stop();
+		}
+
+		public void Pause()
+		{
+			_controller.Pause();
+		}
+
+		public void Continue()
+		{
+			_controller.Continue();
+		}
+
+		public void Dispose()
+		{
+		}
+	}
 }

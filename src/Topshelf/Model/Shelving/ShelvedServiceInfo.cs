@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,30 +12,29 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model.Shelving
 {
-    using System.IO;
+	using System;
+	using System.IO;
+	using System.Reflection;
 
-    public class ShelvedServiceInfo
-    {
-        readonly string _fullPath;
-        readonly string _inferredName;
+	[Serializable]
+	public class ShelvedServiceInfo
+	{
+		public ShelvedServiceInfo(string path)
+			: this(new DirectoryInfo(path))
+		{
+		}
 
-        public ShelvedServiceInfo(string path)
-        {
-            _inferredName = new DirectoryInfo(path).Name;
-            _fullPath = new DirectoryInfo(path).FullName;
-        }
+		public ShelvedServiceInfo(FileSystemInfo info)
+		{
+			InferredName = info.Name;
+			FullPath = info.FullName;
+			AssemblyName = AssemblyName.GetAssemblyName(Path.Combine(FullPath, InferredName + ".dll"));
+		}
 
-        public string InferredName
-        {
-            get { return _inferredName; }
-        }
+		public AssemblyName AssemblyName { get; private set; }
 
-        public string FullPath
-        {
-            get
-            {
-                return _fullPath;
-            }
-        }
-    }
+		public string InferredName { get; private set; }
+
+		public string FullPath { get; private set; }
+	}
 }

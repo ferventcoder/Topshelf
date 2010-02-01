@@ -10,19 +10,22 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Shelving.Configuration
+namespace One
 {
-	public interface Config
-	{
-		string ServicesDirectory { get; }
-		RunAs HowToRun { get; }
-	}
+	using System;
+	using Topshelf.Model.Shelving;
 
-	public enum RunAs
+	public class ServiceBoostrapper :
+		Bootstrapper
 	{
-		LocalSystem,
-		NetworkService,
-		Interactive,
-		LocalService
+		public Type ServiceType
+		{
+			get { return typeof(Service); }
+		}
+
+		public object BuildService()
+		{
+			return new Service();
+		}
 	}
 }

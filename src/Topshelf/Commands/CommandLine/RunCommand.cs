@@ -34,9 +34,7 @@ namespace Topshelf.Commands.CommandLine
             _serviceName = serviceName;
         }
 
-        #region Command Members
-
-        public string Name
+    	public string Name
         {
             get { return "command"; }
         }
@@ -100,7 +98,5 @@ namespace Topshelf.Commands.CommandLine
                 _log.WarnFormat("There is an instance of this {0} running as a windows service", _serviceName);
             }
         }
-
-        #endregion
     }
 }

@@ -17,9 +17,9 @@ namespace Topshelf.Model.ApplicationDomain
     public class AppDomainBundle
     {
         readonly AppDomain _domain;
-        readonly TopshelfAppDomainManager _manager;
+        readonly AppDomainManager _manager;
 
-        public AppDomainBundle(AppDomain domain, TopshelfAppDomainManager manager)
+        public AppDomainBundle(AppDomain domain, AppDomainManager manager)
         {
             _domain = domain;
             _manager = manager;
@@ -30,7 +30,7 @@ namespace Topshelf.Model.ApplicationDomain
             get { return _domain; }
         }
 
-        public TopshelfAppDomainManager Manager
+        public AppDomainManager Manager
         {
             get { return _manager; }
         }

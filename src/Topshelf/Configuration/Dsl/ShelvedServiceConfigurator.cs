@@ -26,9 +26,7 @@ namespace Topshelf.Configuration.Dsl
         string _pathToConfigurationFile;
         string[] _args;
 
-        #region IShelvedServiceConfigurator Members
-
-        public void PathToPrivateBin(string pathToPrivateBin)
+    	public void PathToPrivateBin(string pathToPrivateBin)
         {
             _pathToPrivateBin = pathToPrivateBin;
             _pathToConfigurationFile = Path.Combine(_pathToPrivateBin, "{0}.config".FormatWith(_name));
@@ -44,9 +42,7 @@ namespace Topshelf.Configuration.Dsl
             _args = args;
         }
 
-        #endregion
-
-        public IServiceController Create()
+    	public IServiceController Create()
         {
             IServiceController serviceController = new ShelvedServiceControllerProxy
                                                    {
