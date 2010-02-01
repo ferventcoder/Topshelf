@@ -15,45 +15,63 @@ namespace ShelfHost
 	using System;
 	using System.IO;
 	using System.Linq;
-	using System.Reflection;
+	using Commands;
 	using Magnum;
-	using Topshelf.Model.ApplicationDomain;
+	using Magnum.Pipeline;
+	using Magnum.Pipeline.Segments;
+	using Topshelf.Events;
 	using Topshelf.Model.Shelving;
 
 	internal class Program
 	{
+		static IHostConfiguration _configuration;
+
+		public static Pipe EventAggregator { get; private set; }
+
 		static void Main(string[] args)
 		{
+			EventAggregator = PipeSegment.New();
+
+			_configuration = new HostConfiguration();
+
+			var coordinator = new ShelvedServiceCoordinator(EventAggregator, _configuration);
+			coordinator.Start();
+
 			Console.WriteLine("Starting up...");
 
 			ShelvedServiceInfo[] services = GetHostedServices();
 			services.Each(x =>
 				{
-					Console.WriteLine("STarting service:" + x.InferredName);
-					StartService(x);
+					var message = new NewServiceFoundImpl
+						{
+							ServicePath = x.FullPath
+						};
+
+					EventAggregator.Send(message);
 				});
 
+			// TODO file system watcher for .config changes
 
 			Console.WriteLine("Hit it...");
 			Console.ReadLine();
+
+			Console.WriteLine("Shutting down...");
+			EventAggregator.Send(new ShutdownHostImpl
+				{
+					Reason = "Service Host Exiting",
+				});
+
+			coordinator.Dispose();
+			coordinator = null;
+
+			Console.WriteLine("Program complete.");
+			Console.ReadLine();
 		}
 
-		static void StartService(ShelvedServiceInfo info)
-		{
-			var bundle = AppDomainFactory.CreateNewAppDomain(info, GetCachePath());
-
-			bundle.Controller.Start();
-
-			Console.WriteLine("Service was started: " + info.InferredName);
-
-			bundle.Controller.Stop();
-
-			Console.WriteLine("Service was stopped: " + info.InferredName);
-		}
 
 		static ShelvedServiceInfo[] GetHostedServices()
 		{
-			string servicePath = GetServicesPath();
+			string servicePath = _configuration.ServicesPath;
 			Console.WriteLine("Opening service folder: " + servicePath);
 
 			if (!Directory.Exists(servicePath))
@@ -71,36 +89,55 @@ namespace ShelfHost
 					})
 				.ToArray();
 		}
-
-		static string GetServicesPath()
-		{
-			string hostPath = GetHostPath();
-
-			string serviceFolderName = "Services";
-			return Path.Combine(Path.GetDirectoryName(hostPath), serviceFolderName);
-		}
-
-		static string GetCachePath()
-		{
-			string hostPath = GetHostPath();
-
-			string cacheFolderName = "AssemblyCache";
-			return Path.Combine(Path.GetDirectoryName(hostPath), cacheFolderName);
-		}
-
-		static string GetHostPath()
-		{
-			string hostPath = Assembly.GetExecutingAssembly().Location;
-			Console.WriteLine("Host Path: " + hostPath);
-			return hostPath;
-		}
 	}
 
-	public class HostedService
+
+	public interface ILogger
 	{
-		public HostedService(string path)
+		bool IsDebugEnabled { get; }
+		void Debug(string message);
+	}
+
+
+	public interface ILogProvider
+	{
+		ILogger GetLogger(string name);
+	}
+
+	public enum LogLevel
+	{
+		Debug,
+		Info,
+		Warn,
+		Error,
+		Fatal,
+	}
+
+	public class Logger
+	{
+		readonly ILogger _logger;
+		static readonly ILogProvider _logProvider;
+
+		public Logger(string name)
 		{
-			Console.WriteLine("Service found at: " + path);
+			_logger = _logProvider.GetLogger(name);
+		}
+
+		public void Debug(Action<ILogger> logAction)
+		{
+			if (_logger.IsDebugEnabled)
+				logAction(_logger);
+		}
+
+		public static Logger GetLogger(string name)
+		{
+			return new Logger(name);
+		}
+
+		public void Debug(string message)
+		{
+			if (_logger.IsDebugEnabled)
+				_logger.Debug(message);
 		}
 	}
 }

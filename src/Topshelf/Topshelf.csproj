@@ -68,6 +68,10 @@
     <Compile Include="Commands\WinService\SubCommands\WinServiceHelper.cs" />
     <Compile Include="Configuration\Dsl\IShelvedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\ShelvedServiceConfigurator.cs" />
+    <Compile Include="Events\InstalledServiceEvent.cs" />
+    <Compile Include="Events\NewServiceFound.cs" />
+    <Compile Include="Events\ServiceUpdated.cs" />
+    <Compile Include="Commands\ShutdownHost.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\IsolatedServiceConfigurator.cs" />
