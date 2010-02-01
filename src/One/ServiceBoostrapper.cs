@@ -25,7 +25,9 @@ namespace One
 
 		public object BuildService()
 		{
-			return new Service();
+			var service = new Service();
+
+			return service;
 		}
 	}
 }

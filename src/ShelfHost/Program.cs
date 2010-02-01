@@ -41,6 +41,14 @@ namespace ShelfHost
 		static void StartService(ShelvedServiceInfo info)
 		{
 			var bundle = AppDomainFactory.CreateNewAppDomain(info, GetCachePath());
+
+			bundle.Controller.Start();
+
+			Console.WriteLine("Service was started: " + info.InferredName);
+
+			bundle.Controller.Stop();
+
+			Console.WriteLine("Service was stopped: " + info.InferredName);
 		}
 
 		static ShelvedServiceInfo[] GetHostedServices()

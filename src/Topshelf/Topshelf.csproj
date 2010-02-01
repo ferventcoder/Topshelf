@@ -72,7 +72,7 @@
     <Compile Include="Configuration\Dsl\IIsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\IsolatedServiceConfigurator.cs" />
     <Compile Include="Configuration\Dsl\ServiceConfiguratorBase.cs" />
-    <Compile Include="Exceptions\CouldntBuildServiceException.cs" />
+    <Compile Include="Exceptions\BuildServiceException.cs" />
     <Compile Include="Model\ApplicationDomain\AppDomainBundle.cs" />
     <Compile Include="Model\ApplicationDomain\TopshelfAppDomainManager.cs" />
     <Compile Include="Model\Isolated\IsolatedServiceInfo.cs" />

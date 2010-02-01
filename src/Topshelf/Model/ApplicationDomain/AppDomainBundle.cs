@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,32 +12,39 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model.ApplicationDomain
 {
-    using System;
+	using System;
 
-    public class AppDomainBundle
-    {
-        readonly AppDomain _domain;
-        readonly AppDomainManager _manager;
+	public class AppDomainBundle
+	{
+		readonly IServiceController _controller;
+		readonly AppDomain _domain;
+		readonly AppDomainManager _manager;
 
-        public AppDomainBundle(AppDomain domain, AppDomainManager manager)
-        {
-            _domain = domain;
-            _manager = manager;
-        }
+		public AppDomainBundle(AppDomain domain, AppDomainManager manager, IServiceController controller)
+		{
+			_domain = domain;
+			_manager = manager;
+			_controller = controller;
+		}
 
-        public AppDomain Domain
-        {
-            get { return _domain; }
-        }
+		public IServiceController Controller
+		{
+			get { return _controller; }
+		}
 
-        public AppDomainManager Manager
-        {
-            get { return _manager; }
-        }
+		public AppDomain Domain
+		{
+			get { return _domain; }
+		}
 
-        public void Dispose()
-        {
-            AppDomain.Unload(_domain);
-        }
-    }
+		public AppDomainManager Manager
+		{
+			get { return _manager; }
+		}
+
+		public void Dispose()
+		{
+			AppDomain.Unload(_domain);
+		}
+	}
 }

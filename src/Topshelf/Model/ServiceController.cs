@@ -1,5 +1,5 @@
 // Copyright 2007-2008 The Apache Software Foundation.
-// 
+//  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
 // License at 
@@ -12,147 +12,179 @@
 // specific language governing permissions and limitations under the License.
 namespace Topshelf.Model
 {
-    using System;
-    using System.Diagnostics;
-    using Exceptions;
-    using Magnum.StateMachine;
+	using System;
+	using System.Diagnostics;
+	using Exceptions;
+	using Magnum.Reflection;
+	using Magnum.StateMachine;
 
-    [DebuggerDisplay("Service({Name}) is {State}")]
-    public class ServiceController<TService> :
-        StateMachine<ServiceController<TService>>,
-        IServiceController
-        where TService : class
-    {
-        #region StateMachine
+	[DebuggerDisplay("Service({Name}) is {State}")]
+	public class ServiceController<TService> :
+		StateMachine<ServiceController<TService>>,
+		IServiceController
+		where TService : class
+	{
+		bool _disposed;
+		TService _instance;
 
-        static ServiceController()
-        {
-            Define(() =>
-            {
-                Initially(
-                    When(OnStart)
-                        .Then(sc => sc.BuildInstance())
-                        .Then(sc => sc.StartAction(sc._instance))
-                        .TransitionTo(Started)
-                    );
+		static ServiceController()
+		{
+			Define(() =>
+				{
+					Initially(
+						When(OnStart)
+							.Call(x => x.BuildAndStartService())
+							.TransitionTo(Started)
+						);
 
-                During(Started,
-                       When(OnPause)
-                           .Then(sc => sc.PauseAction(sc._instance))
-                           .TransitionTo(Paused));
+					During(Started,
+						When(OnPause)
+							.Then(sc => sc.PauseAction(sc._instance))
+							.TransitionTo(Paused));
 
-                During(Paused,
-                       When(OnContinue)
-                           .Then(sc => sc.ContinueAction(sc._instance))
-                           .TransitionTo(Started));
-
-
-                Anytime(
-                    When(OnStop)
-                        .Then(sc => sc.StopAction(sc._instance))
-                        .TransitionTo(Stopped)
-                    );
-            });
-        }
-
-        public static Event OnStart { get; set; }
-        public static Event OnStop { get; set; }
-        public static Event OnPause { get; set; }
-        public static Event OnContinue { get; set; }
-
-        public static State Initial { get; set; }
-        public static State Started { get; set; }
-        public static State Stopped { get; set; }
-        public static State Paused { get; set; }
-        public static State Completed { get; set; }
-
-        #endregion
-
-        TService _instance;
-        public Action<TService> StartAction { get; set; }
-        public Action<TService> StopAction { get; set; }
-        public Action<TService> PauseAction { get; set; }
-        public Action<TService> ContinueAction { get; set; }
-        public ServiceBuilder BuildService { get; set; }
-
-        #region IDisposable
-
-        bool _disposed;
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected void Dispose(bool disposing)
-        {
-            if (!disposing) return;
-            if (!_disposed) return;
+					During(Paused,
+						When(OnContinue)
+							.Then(sc => sc.ContinueAction(sc._instance))
+							.TransitionTo(Started));
 
 
-            _instance = default(TService);
-            StartAction = null;
-            StopAction = null;
-            PauseAction = null;
-            ContinueAction = null;
-            BuildService = null;
-            _disposed = true;
-        }
+					Anytime(
+						When(OnStop)
+							.Then(sc => sc.StopAction(sc._instance))
+							.TransitionTo(Stopped)
+						);
+				});
+		}
 
-        ~ServiceController()
-        {
-            Dispose(false);
-        }
+		public ServiceController()
+			: this(null)
+		{
+		}
 
-        #endregion
+		public ServiceController(ServiceBuilder buildService)
+		{
+			StartAction = DefaultStartMethod;
+			StopAction = DefaultStopMethod;
+			PauseAction = DefaultSuspendMethod;
+			ContinueAction = DefaultResumeMethod;
+			BuildService = buildService;
+		}
 
-        #region IServiceController Members
+		public static Event OnStart { get; set; }
+		public static Event OnStop { get; set; }
+		public static Event OnPause { get; set; }
+		public static Event OnContinue { get; set; }
 
-        public void Initialize()
-        {
-            
-        }
+		public static State Initial { get; set; }
+		public static State Started { get; set; }
+		public static State Stopped { get; set; }
+		public static State Paused { get; set; }
+		public static State Completed { get; set; }
 
-        public void Start()
-        {
-            RaiseEvent(OnStart);
-        }
+		public Action<TService> StartAction { get; set; }
+		public Action<TService> StopAction { get; set; }
+		public Action<TService> PauseAction { get; set; }
+		public Action<TService> ContinueAction { get; set; }
+		public ServiceBuilder BuildService { get; set; }
 
-        public void Stop()
-        {
-            RaiseEvent(OnStop);
-        }
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-        public void Pause()
-        {
-            RaiseEvent(OnPause);
-        }
+		public void Initialize()
+		{
+		}
 
-        public void Continue()
-        {
-            RaiseEvent(OnContinue);
-        }
+		public void Start()
+		{
+			RaiseEvent(OnStart);
+		}
+
+		public void Stop()
+		{
+			RaiseEvent(OnStop);
+		}
+
+		public void Pause()
+		{
+			RaiseEvent(OnPause);
+		}
+
+		public void Continue()
+		{
+			RaiseEvent(OnContinue);
+		}
 
 
-        public string Name { get; set; }
+		public string Name { get; set; }
 
-        public Type ServiceType
-        {
-            get { return typeof(TService); }
-        }
+		public Type ServiceType
+		{
+			get { return typeof(TService); }
+		}
 
-        public ServiceState State
-        {
-            get { return (ServiceState) Enum.Parse(typeof(ServiceState), CurrentState.Name, true); }
-        }
+		public ServiceState State
+		{
+			get { return (ServiceState)Enum.Parse(typeof(ServiceState), CurrentState.Name, true); }
+		}
 
-        #endregion
+		protected void Dispose(bool disposing)
+		{
+			if (!disposing)
+				return;
+			if (!_disposed)
+				return;
 
-        void BuildInstance()
-        {
-            _instance = (TService)BuildService(Name);
-            if (_instance == null) throw new CouldntBuildServiceException(Name, typeof(TService));
-        }
-    }
+
+			_instance = default(TService);
+			StartAction = null;
+			StopAction = null;
+			PauseAction = null;
+			ContinueAction = null;
+			BuildService = null;
+			_disposed = true;
+		}
+
+
+		void BuildAndStartService()
+		{
+			BuildInstance();
+			StartAction(_instance);
+		}
+
+
+		void BuildInstance()
+		{
+			_instance = (TService)BuildService(Name);
+			if (_instance == null)
+				throw new BuildServiceException(Name, typeof(TService));
+		}
+
+		~ServiceController()
+		{
+			Dispose(false);
+		}
+
+		static void DefaultStartMethod(TService service)
+		{
+			service.FastInvoke("Start");
+		}
+
+		static void DefaultStopMethod(TService service)
+		{
+			service.FastInvoke("Stop");
+		}
+
+		static void DefaultSuspendMethod(TService service)
+		{
+			service.FastInvoke("Suspend");
+		}
+
+		static void DefaultResumeMethod(TService service)
+		{
+			service.FastInvoke("Resume");
+		}
+	}
 }

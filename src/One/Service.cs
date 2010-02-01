@@ -12,7 +12,18 @@
 // specific language governing permissions and limitations under the License.
 namespace One
 {
+	using System;
+
 	public class Service
 	{
+		public void Start()
+		{
+			Console.WriteLine("Starting service");
+		}
+
+		public void Stop()
+		{
+			Console.WriteLine("Stopping Service");
+		}
 	}
 }

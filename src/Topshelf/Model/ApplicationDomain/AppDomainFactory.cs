@@ -13,7 +13,6 @@
 namespace Topshelf.Model.ApplicationDomain
 {
 	using System;
-	using System.Globalization;
 	using System.IO;
 	using System.Reflection;
 	using System.Security.Policy;
@@ -41,13 +40,12 @@ namespace Topshelf.Model.ApplicationDomain
 			AppDomain domain = AppDomain.CreateDomain(domainName, evidence, setup);
 
 			var args = new object[] {info.AssemblyName};
-			var manager = (AppDomainManager)domain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().GetName().ToString(),
-			                                	typeof(ShelvedAppDomainManager).FullName, true, BindingFlags.Public|BindingFlags.Instance, null, args,
-			                                	null, null, null);
+			var manager = (ShelvedAppDomainManager)domain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().GetName().ToString(),
+			                                	typeof(ShelvedAppDomainManager).FullName, true,
+			                                	BindingFlags.Public | BindingFlags.Instance,
+			                                	null, args, null, null, null);
 
-			//Assembly assembly = domain.Load(info.AssemblyName);
-
-			return new AppDomainBundle(domain, manager);
+			return new AppDomainBundle(domain, manager, manager);
 		}
 
 		public static AppDomainBundle CreateNewAppDomain(IsolatedServiceInfo info)
@@ -69,7 +67,7 @@ namespace Topshelf.Model.ApplicationDomain
 			AppDomain domain = AppDomain.CreateDomain(info.Name, null, setup);
 			var args = new object[] {info.Type, info.Actions};
 			var mgr = (TopshelfAppDomainManager)domain.CreateInstanceAndUnwrap("", "", true, BindingFlags.Public, null, args, null, null, null);
-			return new AppDomainBundle(domain, mgr);
+			return new AppDomainBundle(domain, mgr, null);
 		}
 	}
 }

@@ -21,42 +21,47 @@ namespace Topshelf.Model.Shelving
 		IServiceController
 	{
 		readonly Bootstrapper _bootstrapper;
+		readonly Type _bootstrapperType;
 		readonly IServiceController _controller;
+		readonly AssemblyName _servicePath;
+		Assembly _assembly;
 
 		public ShelvedAppDomainManager(AssemblyName servicePath)
 		{
-			var assembly = AppDomain.CurrentDomain.Load(servicePath);
+			_servicePath = servicePath;
 
-			Type type = AppDomain.CurrentDomain.GetAssemblies()
-				.SelectMany(x => x.GetTypes())
-				.Where(x => x.IsInterface == false)
-				.Where(x => typeof(Bootstrapper).IsAssignableFrom(x))
-				.FirstOrDefault();
+			LoadServiceAssemblyIntoAppDomain();
 
-			if (type == null)
-				throw new InvalidOperationException("The bootstrapper was not found.");
+			_bootstrapperType = FindBootstrapperImplementation();
 
-			_bootstrapper = Activator.CreateInstance(type) as Bootstrapper;
+			_bootstrapper = Activator.CreateInstance(_bootstrapperType) as Bootstrapper;
 			if (_bootstrapper == null)
-				throw new InvalidOperationException("Unable to create the bootstrapper");
+				throw new InvalidOperationException("Unable to create the bootstrapper: " + _bootstrapperType.FullName);
 
 			Type controllerType = typeof(ServiceController<>).MakeGenericType(_bootstrapper.ServiceType);
 
-			_controller = Activator.CreateInstance(controllerType) as IServiceController;
+			ServiceBuilder builder = x =>
+				{
+					return _bootstrapper.BuildService();
+				};
+
+			_controller = Activator.CreateInstance(controllerType, builder) as IServiceController;
+			if (_controller == null)
+				throw new InvalidOperationException("Unable to create controller for service: " + _bootstrapper.ServiceType.FullName);
+
+			_controller.Initialize();
 		}
 
 		public string Name
 		{
 			get { return _controller.Name; }
+			set { _controller.Name = Name; }
 		}
-
 
 		public Type ServiceType
 		{
 			get { return _controller.ServiceType; }
 		}
-
-		string IServiceController.Name { get; set; }
 
 		public ServiceState State
 		{
@@ -95,6 +100,24 @@ namespace Topshelf.Model.Shelving
 
 		public void Dispose()
 		{
+		}
+
+		void LoadServiceAssemblyIntoAppDomain()
+		{
+			_assembly = AppDomain.CurrentDomain.Load(_servicePath);
+		}
+
+		static Type FindBootstrapperImplementation()
+		{
+			Type type = AppDomain.CurrentDomain.GetAssemblies()
+				.SelectMany(x => x.GetTypes())
+				.Where(x => x.IsInterface == false)
+				.Where(x => typeof(Bootstrapper).IsAssignableFrom(x))
+				.FirstOrDefault();
+
+			if (type == null)
+				throw new InvalidOperationException("The bootstrapper was not found.");
+			return type;
 		}
 	}
 }
