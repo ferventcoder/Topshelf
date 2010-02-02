@@ -21,7 +21,7 @@ namespace Topshelf.Model.ApplicationDomain
 
 	public class AppDomainFactory
 	{
-		public static AppDomainBundle CreateNewAppDomain(ShelvedServiceInfo info, string cachePath)
+		public static AppDomainBundle CreateNewShelvedAppDomain(ShelvedServiceInfo info, string cachePath)
 		{
 			AppDomainSetup setup = AppDomain.CurrentDomain.SetupInformation;
 
@@ -37,7 +37,7 @@ namespace Topshelf.Model.ApplicationDomain
 			string domainName = info.InferredName + "AppDomain";
 			var evidence = new Evidence(AppDomain.CurrentDomain.Evidence);
 
-			AppDomain domain = AppDomain.CreateDomain(domainName, evidence, setup);
+			AppDomain domain = AppDomain.CreateDomain(domainName, null, setup);
 
 			var args = new object[] {info.AssemblyName};
 			var manager = (ShelvedAppDomainManager)domain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().GetName().ToString(),
@@ -45,29 +45,33 @@ namespace Topshelf.Model.ApplicationDomain
 			                                	BindingFlags.Public | BindingFlags.Instance,
 			                                	null, args, null, null, null);
 
-            //TODO
 			return new AppDomainBundle(domain, manager);
 		}
 
-		public static AppDomainBundle CreateNewAppDomain(IsolatedServiceInfo info, string cachePath)
+		public static AppDomainBundle CreateNewIsolatedAppDomain(IsolatedServiceInfo info, string cachePath)
 		{
 			AppDomainSetup setup = AppDomain.CurrentDomain.SetupInformation;
+            
+            //private bin path : no
+            //application base : no
+		    setup.ApplicationName = info.Name;
+
+            if (!string.IsNullOrEmpty(info.PathToConfigurationFile))
+		        setup.ConfigurationFile = info.PathToConfigurationFile;
 
 			setup.ShadowCopyFiles = true.ToString();
-		    setup.CachePath = cachePath;
+            //shadow copy directories
+		    setup.CachePath = Path.Combine(cachePath, info.Name);
 
-			if (!string.IsNullOrEmpty(info.PathToConfigurationFile))
-			{
-				setup.ConfigurationFile = info.PathToConfigurationFile;
-			}
 
 			if (info.Args != null)
 				setup.AppDomainInitializerArguments = info.Args;
+
 			if (info.ConfigureArgsAction != null)
 				setup.AppDomainInitializer = info.ConfigureArgsAction();
 
 			AppDomain domain = AppDomain.CreateDomain(info.Name, null, setup);
-			var args = new object[] {info.Type, info.Actions};
+			var args = new object[] {info.Actions};
 
             var mgr = (IsolatedAppDomainManager)domain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().GetName().ToString(),
                 typeof(IsolatedAppDomainManager).FullName, true,

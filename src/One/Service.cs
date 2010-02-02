@@ -18,7 +18,7 @@ namespace One
 	{
 		public void Start()
 		{
-			Console.WriteLine("Starting service");
+			Console.WriteLine("Starting service - '{0}'", AppDomain.CurrentDomain.FriendlyName);
 		}
 
 		public void Stop()

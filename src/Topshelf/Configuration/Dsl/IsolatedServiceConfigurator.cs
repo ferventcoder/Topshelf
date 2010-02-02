@@ -14,6 +14,7 @@ namespace Topshelf.Configuration.Dsl
 {
     using System;
     using Model;
+    using Model.ApplicationDomain;
     using Model.Isolated;
 
     public class IsolatedServiceConfigurator<TService> :
@@ -28,29 +29,30 @@ namespace Topshelf.Configuration.Dsl
 
         public IServiceController Create()
         {
-            var actions = new SerializableActions<object>();
-            actions.StartAction = Convert(_startAction);
-            actions.StopAction = Convert(_stopAction);
-            actions.PauseAction = Convert(_pauseAction);
-            actions.ContinueAction = Convert(_continueAction);
-            actions.BuildAction = _buildAction;
+            var actions = SerializableActions<object>.ConvertActions(_startAction,
+                                                                     _stopAction,
+                                                                     _pauseAction,
+                                                                     _continueAction,
+                                                                     _buildAction);
 
-            IServiceController serviceController = new IsolatedServiceControllerProxy(typeof(TService), actions)
-                                                   {
-                                                       Name = _name,
-                                                       //app domain things
-                                                       PathToConfigurationFile = _pathToConfigurationFile,
-                                                       Args = _args,
-                                                       ConfigureArgsAction = _callback
-                                                   };
+            var info = new IsolatedServiceInfo
+                       {
+                           Args = _args,
+                           ConfigureArgsAction = null,
+                           PathToConfigurationFile = _pathToConfigurationFile,
+                           Callback = _callback,
+                           Actions = actions,
+                           Name = _name
+                       };
+
+            AppDomainBundle bundle = AppDomainFactory.CreateNewIsolatedAppDomain(info, "");
+
+            IServiceController serviceController = new IsolatedServiceControllerProxy(bundle.Domain, (IsolatedAppDomainManager) bundle.Controller);
 
             return serviceController;
         }
 
-        public Action<object> Convert(Action<TService> input)
-        {
-            return o => input((TService) o);
-        }
+        
 
         public void ConfigurationFile(string pathToConfigurationFile)
         {

@@ -42,7 +42,7 @@ namespace ShelfHost
 		{
 			var info = new ShelvedServiceInfo(message.ServicePath);
 
-			AppDomainBundle bundle = AppDomainFactory.CreateNewAppDomain(info, _configuration.CachePath);
+			AppDomainBundle bundle = AppDomainFactory.CreateNewShelvedAppDomain(info, _configuration.CachePath);
 
 			bundle.Controller.Start();
 

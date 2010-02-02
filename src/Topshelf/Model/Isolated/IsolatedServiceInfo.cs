@@ -14,6 +14,7 @@ namespace Topshelf.Model.Isolated
 {
     using System;
 
+    [Serializable]
     public class IsolatedServiceInfo
     {
         public string Name { get; set; }
@@ -21,6 +22,7 @@ namespace Topshelf.Model.Isolated
         public string[] Args { get; set; }
         public Func<AppDomainInitializer> ConfigureArgsAction { get; set; }
         public SerializableActions<object> Actions { get; set; }
-        public Type Type { get; set; }
+
+        public Func<AppDomainInitializer> Callback { get; set; }
     }
 }

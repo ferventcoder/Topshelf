@@ -16,77 +16,69 @@ namespace Topshelf.Model.Isolated
 
     //this class is remoted accross, and should delegate actions to the real service controller
     public class IsolatedServiceControllerProxy :
-        MarshalByRefObject,
         IServiceController
     {
-        readonly IServiceController _wrappedServiceController;
+        readonly IsolatedAppDomainManager _manager;
+        AppDomain _domain;
 
-        public IsolatedServiceControllerProxy(Type type, SerializableActions<object> actions)
+        public IsolatedServiceControllerProxy(AppDomain domain, IsolatedAppDomainManager manager)
         {
-            Actions = actions;
-            _wrappedServiceController = (IServiceController)typeof(ServiceController<>).MakeGenericType(type);
-            //TODO: how to set actions on wrapped service controller
+            _domain = domain;
+            _manager = manager;
         }
 
-        public SerializableActions<object> Actions { get; set; }
         #region IServiceController Members
 
         public void Initialize()
         {
-            _wrappedServiceController.Initialize();
+            _manager.Initialize();
         }
 
         public void Dispose()
         {
-            _wrappedServiceController.Dispose();
+            _manager.Dispose();
         }
 
         public Type ServiceType
         {
-            get { return _wrappedServiceController.ServiceType; }
+            get { return _manager.ServiceType; }
         }
 
         public string Name
         {
-            get { return _wrappedServiceController.Name; }
-            set { _wrappedServiceController.Name = value; }
+            get { return _manager.Name; }
+            set { _manager.Name = value; }
         }
 
         public ServiceState State
         {
-            get { return _wrappedServiceController.State; }
+            get { return _manager.State; }
         }
 
         public void Start()
         {
-            _wrappedServiceController.Start();
+            _manager.Start();
         }
 
         public void Stop()
         {
-            _wrappedServiceController.Stop();
+            _manager.Stop();
         }
 
         public void Pause()
         {
-            _wrappedServiceController.Pause();
+            _manager.Pause();
         }
 
         public void Continue()
         {
-            _wrappedServiceController.Continue();
+            _manager.Continue();
         }
 
         public ServiceBuilder BuildService
         {
-            get { return _wrappedServiceController.BuildService; }
+            get { return _manager.BuildService; }
         }
-
-        public string PathToConfigurationFile { get; set; }
-
-        public string[] Args { get; set; }
-
-        public Func<AppDomainInitializer> ConfigureArgsAction { get; set; }
 
         #endregion
     }

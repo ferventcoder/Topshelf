@@ -19,18 +19,14 @@ namespace Topshelf.Model.Shelving
     public class ShelvedServiceControllerProxy :
         IServiceController
     {
-        //this should be newed up in the remote app domain
-        ShelvedAppDomainManager _manager = null;
-        public string PathToConfigurationFile { get; set; }
-        AppDomain _domain;
+        readonly ShelvedAppDomainManager _manager;
+        readonly AppDomain _domain;
 
         public ShelvedServiceControllerProxy(AppDomain domain, ShelvedAppDomainManager manager)
         {
             _domain = domain;
             _manager = manager;
         }
-
-        public string[] Args { get; set; }
 
     	public void Initialize()
         {

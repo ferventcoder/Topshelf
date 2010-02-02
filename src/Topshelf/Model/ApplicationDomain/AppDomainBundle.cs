@@ -34,10 +34,5 @@ namespace Topshelf.Model.ApplicationDomain
 		{
 			get { return _domain; }
 		}
-
-		public void Dispose()
-		{
-			AppDomain.Unload(_domain);
-		}
 	}
 }

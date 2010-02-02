@@ -19,13 +19,17 @@ namespace Topshelf.Model.Isolated
         MarshalByRefObject,
         IServiceController
     {
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <filterpriority>2</filterpriority>
+        SerializableActions<object> _actions;
+        object _service;
+
+        public IsolatedAppDomainManager(SerializableActions<object> actions)
+        {
+            _actions = actions;
+        }
+
         public void Dispose()
         {
-            throw new NotImplementedException();
+
         }
 
         public string Name
@@ -46,32 +50,32 @@ namespace Topshelf.Model.Isolated
 
         public ServiceBuilder BuildService
         {
-            get { throw new NotImplementedException(); }
+            get { return _actions.BuildAction; }
         }
 
         public void Initialize()
         {
-            throw new NotImplementedException();
+            _service = BuildService(Name);
         }
 
         public void Start()
         {
-            throw new NotImplementedException();
+            _actions.StartAction(_service);
         }
 
         public void Stop()
         {
-            throw new NotImplementedException();
+            _actions.StopAction(_service);
         }
 
         public void Pause()
         {
-            throw new NotImplementedException();
+            _actions.PauseAction(_service);
         }
 
         public void Continue()
         {
-            throw new NotImplementedException();
+            _actions.ContinueAction(_service);
         }
     }
 }

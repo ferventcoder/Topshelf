@@ -46,12 +46,10 @@ namespace Topshelf.Configuration.Dsl
     	public IServiceController Create()
         {
     	    var info = new ShelvedServiceInfo("");
-    	    var bundle = AppDomainFactory.CreateNewAppDomain(info, "");
+    	    var bundle = AppDomainFactory.CreateNewShelvedAppDomain(info, "");
             IServiceController serviceController = new ShelvedServiceControllerProxy(bundle.Domain, (ShelvedAppDomainManager)bundle.Controller)
                                                    {
-                                                       Name = _name,
-                                                       PathToConfigurationFile = _pathToConfigurationFile,
-                                                       Args = _args
+                                                       Name = _name
                                                    };
 
             return serviceController;
