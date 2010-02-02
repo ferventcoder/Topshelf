@@ -11,26 +11,29 @@ namespace Topshelf.Model.Isolated
         public Action<TService> ContinueAction { get; set; }
         public ServiceBuilder BuildAction { get; set; }
 
-
-
-
-
-
-        public static Action<object> Convert<O>(Action<O> input)
+        public void StartActionObject(object obj)
         {
-            return o => input((O)o);
+            StartAction((TService)obj);
         }
 
-        public static SerializableActions<object> ConvertActions<O>(Action<O> startAction, Action<O> stopAction, Action<O> pauseAction, Action<O> continueAction, ServiceBuilder builder)
+        public void StopActionObject(object obj)
         {
-            return new SerializableActions<object>
-                   {
-                       StartAction = Convert(startAction),
-                       StopAction = Convert(stopAction),
-                       PauseAction = Convert(pauseAction),
-                       ContinueAction = Convert(continueAction),
-                       BuildAction = builder
-            };
+            StopAction((TService)obj);
+        }
+
+        public void PauseActionObject(object obj)
+        {
+            PauseAction((TService)obj);
+        }
+
+        public void ContinueActionObject(object obj)
+        {
+            ContinueAction((TService)obj);
+        }
+
+        public object BuildServiceObject(string name)
+        {
+            return BuildAction(name);
         }
     }
 }

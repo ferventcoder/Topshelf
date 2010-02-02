@@ -29,11 +29,12 @@ namespace Topshelf.Configuration.Dsl
 
         public IServiceController Create()
         {
-            var actions = SerializableActions<object>.ConvertActions(_startAction,
-                                                                     _stopAction,
-                                                                     _pauseAction,
-                                                                     _continueAction,
-                                                                     _buildAction);
+            var actions = new SerializableActions<TService>();
+            actions.StartAction = _startAction;
+            actions.StopAction = _stopAction;
+            actions.ContinueAction = _continueAction;
+            actions.PauseAction = _pauseAction;
+            actions.BuildAction = _buildAction;
 
             var info = new IsolatedServiceInfo
                        {
@@ -41,8 +42,16 @@ namespace Topshelf.Configuration.Dsl
                            ConfigureArgsAction = null,
                            PathToConfigurationFile = _pathToConfigurationFile,
                            Callback = _callback,
-                           Actions = actions,
-                           Name = _name
+                           Actions = new SerializableActions<object>()
+                                     {
+                                         BuildAction = actions.BuildServiceObject,
+                                         StartAction = actions.StartActionObject,
+                                         StopAction = actions.StopActionObject,
+                                         PauseAction = actions.PauseActionObject,
+                                         ContinueAction = actions.ContinueActionObject
+                                     },
+                           Name = _name,
+                           ServiceType = typeof(TService)
                        };
 
             AppDomainBundle bundle = AppDomainFactory.CreateNewIsolatedAppDomain(info, "");

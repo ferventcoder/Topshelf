@@ -71,7 +71,7 @@ namespace Topshelf.Model.ApplicationDomain
 				setup.AppDomainInitializer = info.ConfigureArgsAction();
 
 			AppDomain domain = AppDomain.CreateDomain(info.Name, null, setup);
-			var args = new object[] {info.Actions};
+			var args = new object[] {info.Actions, info.ServiceType};
 
             var mgr = (IsolatedAppDomainManager)domain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().GetName().ToString(),
                 typeof(IsolatedAppDomainManager).FullName, true,

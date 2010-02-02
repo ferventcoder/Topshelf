@@ -22,7 +22,8 @@ namespace Topshelf.Model.Isolated
         public string[] Args { get; set; }
         public Func<AppDomainInitializer> ConfigureArgsAction { get; set; }
         public SerializableActions<object> Actions { get; set; }
-
         public Func<AppDomainInitializer> Callback { get; set; }
+
+        public Type ServiceType { get; set; }
     }
 }

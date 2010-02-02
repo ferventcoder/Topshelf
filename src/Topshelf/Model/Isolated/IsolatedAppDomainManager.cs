@@ -19,63 +19,78 @@ namespace Topshelf.Model.Isolated
         MarshalByRefObject,
         IServiceController
     {
-        SerializableActions<object> _actions;
+        readonly SerializableActions<object> _actions;
+
+        readonly IServiceController _controller;
+
         object _service;
 
-        public IsolatedAppDomainManager(SerializableActions<object> actions)
+        public IsolatedAppDomainManager(SerializableActions<object> actions, Type serviceType)
         {
             _actions = actions;
+
+            //crazy stuff here
+
+            Type controllerType = typeof(ServiceController<>).MakeGenericType(serviceType);
+
+            _controller = Activator.CreateInstance(controllerType, actions.BuildAction) as IServiceController;
         }
 
-        public void Dispose()
-        {
-
-        }
 
         public string Name
         {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
+            get
+            {
+                return _controller.Name;
+            }
+            set
+            {
+                _controller.Name = value;
+            }
         }
 
         public ServiceState State
         {
-            get { throw new NotImplementedException(); }
+            get { return _controller.State; }
         }
 
         public Type ServiceType
         {
-            get { throw new NotImplementedException(); }
+            get { return _controller.ServiceType; }
         }
 
         public ServiceBuilder BuildService
         {
-            get { return _actions.BuildAction; }
+            get { return _controller.BuildService; }
         }
 
         public void Initialize()
         {
-            _service = BuildService(Name);
+           _controller.Initialize();
         }
 
         public void Start()
         {
-            _actions.StartAction(_service);
+            _controller.Start();
         }
 
         public void Stop()
         {
-            _actions.StopAction(_service);
+            _controller.Stop();
         }
 
         public void Pause()
         {
-            _actions.PauseAction(_service);
+            _controller.Pause();
         }
 
         public void Continue()
         {
-            _actions.ContinueAction(_service);
+            _controller.Continue();
+        }
+
+        public void Dispose()
+        {
         }
     }
 }
