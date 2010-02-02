@@ -82,6 +82,12 @@ namespace Topshelf.Model.Isolated
             get { return _wrappedServiceController.BuildService; }
         }
 
+        public string PathToConfigurationFile { get; set; }
+
+        public string[] Args { get; set; }
+
+        public Func<AppDomainInitializer> ConfigureArgsAction { get; set; }
+
         #endregion
     }
 }

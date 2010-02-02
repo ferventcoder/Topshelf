@@ -10,38 +10,33 @@
 // under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR 
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the 
 // specific language governing permissions and limitations under the License.
-namespace Topshelf.Model.Shelving
+namespace Topshelf.Model.Isolated
 {
     using System;
-    using System.Diagnostics;
+    using ApplicationDomain;
 
-    [DebuggerDisplay("Shelved")]
-    public class ShelvedServiceControllerProxy :
+    public class IsolatedAppDomainManager :
+        MarshalByRefObject,
         IServiceController
     {
-        //this should be newed up in the remote app domain
-        ShelvedAppDomainManager _manager = null;
-        public string PathToConfigurationFile { get; set; }
-        AppDomain _domain;
-
-        public ShelvedServiceControllerProxy(AppDomain domain, ShelvedAppDomainManager manager)
-        {
-            _domain = domain;
-            _manager = manager;
-        }
-
-        public string[] Args { get; set; }
-
-    	public void Initialize()
-        {
-            _manager.Initialize();
-        }
-
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
         public void Dispose()
         {
-            //no-op
-            _manager.Dispose();
-            AppDomain.Unload(_domain);
+            throw new NotImplementedException();
+        }
+
+        public string Name
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public ServiceState State
+        {
+            get { throw new NotImplementedException(); }
         }
 
         public Type ServiceType
@@ -49,36 +44,34 @@ namespace Topshelf.Model.Shelving
             get { throw new NotImplementedException(); }
         }
 
-        public string Name { get; set; }
-
-        public ServiceState State
-        {
-            get { return _manager.State; }
-        }
-
         public ServiceBuilder BuildService
         {
             get { throw new NotImplementedException(); }
         }
 
+        public void Initialize()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Start()
         {
-            _manager.Start();
+            throw new NotImplementedException();
         }
 
         public void Stop()
         {
-            _manager.Stop();
+            throw new NotImplementedException();
         }
 
         public void Pause()
         {
-            _manager.Pause();
+            throw new NotImplementedException();
         }
 
         public void Continue()
         {
-            _manager.Continue();
+            throw new NotImplementedException();
         }
     }
 }

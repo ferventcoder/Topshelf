@@ -45,14 +45,16 @@ namespace Topshelf.Model.ApplicationDomain
 			                                	BindingFlags.Public | BindingFlags.Instance,
 			                                	null, args, null, null, null);
 
-			return new AppDomainBundle(domain, manager, manager);
+            //TODO
+			return new AppDomainBundle(domain, manager);
 		}
 
-		public static AppDomainBundle CreateNewAppDomain(IsolatedServiceInfo info)
+		public static AppDomainBundle CreateNewAppDomain(IsolatedServiceInfo info, string cachePath)
 		{
 			AppDomainSetup setup = AppDomain.CurrentDomain.SetupInformation;
 
-			setup.ShadowCopyFiles = "true";
+			setup.ShadowCopyFiles = true.ToString();
+		    setup.CachePath = cachePath;
 
 			if (!string.IsNullOrEmpty(info.PathToConfigurationFile))
 			{
@@ -66,8 +68,13 @@ namespace Topshelf.Model.ApplicationDomain
 
 			AppDomain domain = AppDomain.CreateDomain(info.Name, null, setup);
 			var args = new object[] {info.Type, info.Actions};
-			var mgr = (TopshelfAppDomainManager)domain.CreateInstanceAndUnwrap("", "", true, BindingFlags.Public, null, args, null, null, null);
-			return new AppDomainBundle(domain, mgr, null);
+
+            var mgr = (IsolatedAppDomainManager)domain.CreateInstanceAndUnwrap(Assembly.GetExecutingAssembly().GetName().ToString(),
+                typeof(IsolatedAppDomainManager).FullName, true,
+                BindingFlags.Public | BindingFlags.Instance, 
+                null, args, null, null, null);
+
+			return new AppDomainBundle(domain, mgr);
 		}
 	}
 }

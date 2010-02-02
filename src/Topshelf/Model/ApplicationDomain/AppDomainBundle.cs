@@ -18,12 +18,10 @@ namespace Topshelf.Model.ApplicationDomain
 	{
 		readonly IServiceController _controller;
 		readonly AppDomain _domain;
-		readonly AppDomainManager _manager;
 
-		public AppDomainBundle(AppDomain domain, AppDomainManager manager, IServiceController controller)
+        public AppDomainBundle(AppDomain domain, IServiceController controller)
 		{
 			_domain = domain;
-			_manager = manager;
 			_controller = controller;
 		}
 
@@ -35,11 +33,6 @@ namespace Topshelf.Model.ApplicationDomain
 		public AppDomain Domain
 		{
 			get { return _domain; }
-		}
-
-		public AppDomainManager Manager
-		{
-			get { return _manager; }
 		}
 
 		public void Dispose()

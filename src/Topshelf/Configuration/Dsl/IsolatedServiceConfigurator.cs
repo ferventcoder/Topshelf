@@ -28,20 +28,28 @@ namespace Topshelf.Configuration.Dsl
 
         public IServiceController Create()
         {
-            IServiceController serviceController = new FacadeToIsolatedServiceController<TService>
+            var actions = new SerializableActions<object>();
+            actions.StartAction = Convert(_startAction);
+            actions.StopAction = Convert(_stopAction);
+            actions.PauseAction = Convert(_pauseAction);
+            actions.ContinueAction = Convert(_continueAction);
+            actions.BuildAction = _buildAction;
+
+            IServiceController serviceController = new IsolatedServiceControllerProxy(typeof(TService), actions)
                                                    {
-                                                       StartAction = _startAction,
-                                                       StopAction = _stopAction,
-                                                       PauseAction = _pauseAction,
-                                                       ContinueAction = _continueAction,
-                                                       BuildAction  = _buildAction,
                                                        Name = _name,
+                                                       //app domain things
                                                        PathToConfigurationFile = _pathToConfigurationFile,
                                                        Args = _args,
                                                        ConfigureArgsAction = _callback
                                                    };
 
             return serviceController;
+        }
+
+        public Action<object> Convert(Action<TService> input)
+        {
+            return o => input((TService) o);
         }
 
         public void ConfigurationFile(string pathToConfigurationFile)

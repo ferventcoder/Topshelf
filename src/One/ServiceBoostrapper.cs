@@ -13,7 +13,7 @@
 namespace One
 {
 	using System;
-	using Topshelf.Model.Shelving;
+	using Topshelf.Model.ApplicationDomain;
 
 	public class ServiceBoostrapper :
 		Bootstrapper

@@ -17,9 +17,11 @@ namespace Topshelf.Model
     public interface IServiceController :
         IDisposable
     {
-        Type ServiceType { get; }
         string Name { get; set; }
         ServiceState State { get; }
+
+        //do these need to be here?
+        Type ServiceType { get; }
         ServiceBuilder BuildService { get; }
 
         void Initialize();

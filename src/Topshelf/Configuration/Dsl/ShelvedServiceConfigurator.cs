@@ -15,6 +15,7 @@ namespace Topshelf.Configuration.Dsl
     using System;
     using System.IO;
     using Model;
+    using Model.ApplicationDomain;
     using Model.Shelving;
 
     public class ShelvedServiceConfigurator :
@@ -44,7 +45,9 @@ namespace Topshelf.Configuration.Dsl
 
     	public IServiceController Create()
         {
-            IServiceController serviceController = new ShelvedServiceControllerProxy
+    	    var info = new ShelvedServiceInfo("");
+    	    var bundle = AppDomainFactory.CreateNewAppDomain(info, "");
+            IServiceController serviceController = new ShelvedServiceControllerProxy(bundle.Domain, (ShelvedAppDomainManager)bundle.Controller)
                                                    {
                                                        Name = _name,
                                                        PathToConfigurationFile = _pathToConfigurationFile,
