@@ -1,4 +1,4 @@
-// Copyright 2007-2010 The Apache Software Foundation.
+// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -15,18 +15,17 @@ namespace Topshelf
 	using FileSystem;
 	using Messages;
 	using Model;
-	using Shelving;
 
 
 	public class Host
 	{
 		public const string DefaultServiceName = "Topshelf.Host";
 
-		readonly IServiceCoordinator _coordinator;
+		readonly IServiceChannel _serviceChannel;
 
-		public Host(IServiceCoordinator coordinator)
+		public Host(IServiceChannel serviceChannel)
 		{
-			_coordinator = coordinator;
+			_serviceChannel = serviceChannel;
 		}
 
 		public void Start()
@@ -36,9 +35,10 @@ namespace Topshelf
 
 		void CreateDirectoryMonitor()
 		{
-			_coordinator.Send(new CreateShelfService("TopShelf.DirectoryMonitor",
-			                                         ShelfType.Internal,
-			                                         typeof(DirectoryMonitorBootstrapper)));
+			var message = new CreateShelfService("TopShelf.DirectoryMonitor",
+			                                     ShelfType.Internal,
+			                                     typeof(DirectoryMonitorBootstrapper));
+			_serviceChannel.Send(message);
 		}
 
 		public void Stop()

@@ -1,4 +1,4 @@
-﻿// Copyright 2007-2010 The Apache Software Foundation.
+﻿// Copyright 2007-2011 The Apache Software Foundation.
 //  
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not use 
 // this file except in compliance with the License. You may obtain a copy of the 
@@ -14,8 +14,6 @@ namespace Topshelf
 {
 	using System;
 	using System.IO;
-	using Configuration;
-	using Configuration.Dsl;
 	using log4net;
 	using log4net.Config;
 
@@ -24,33 +22,35 @@ namespace Topshelf
 	{
 		static readonly ILog _log = LogManager.GetLogger(Host.DefaultServiceName);
 
-		static void Main(string[] args)
+		[LoaderOptimization(LoaderOptimization.MultiDomainHost)]
+		static void Main()
 		{
 			BootstrapLogger();
 
-			RunConfiguration cfg = RunnerConfigurator.New(x =>
+			HostFactory.Run(x =>
 				{
-					x.AfterStoppingServices(h =>
-						{
-							Console.WriteLine("[Topshelf] All services have been stopped");
-						});
+					x.BeforeStartingServices(() => { Console.WriteLine("[Topshelf] Preparing to start host services"); });
 
-					x.ConfigureService<Host>(s =>
-						{
-							s.Named(Host.DefaultServiceName);
-							s.ConstructUsing((name,coordinator) => new Host(coordinator));
-							s.WhenStarted(tc => tc.Start());
-							s.WhenStopped(tc => tc.Stop());
-						});
+					x.AfterStartingServices(() => { Console.WriteLine("[Topshelf] All services have been started"); });
+
+					x.SetServiceName(Host.DefaultServiceName);
+					x.SetDisplayName(Host.DefaultServiceName);
+					x.SetDescription("Topshelf Service Host");
 
 					x.RunAsLocalSystem();
 
-					x.SetDescription("Topshelf Hosting Service");
-					x.SetDisplayName(Host.DefaultServiceName);
-					x.SetServiceName(Host.DefaultServiceName);
-				});
+					x.EnableDashboard();
 
-			Runner.Host(cfg, args);
+					x.Service<Host>(y =>
+						{
+							y.SetServiceName(Host.DefaultServiceName);
+							y.ConstructUsing((name, coordinator) => new Host(coordinator));
+							y.WhenStarted(host => host.Start());
+							y.WhenStopped(host => host.Stop());
+						});
+
+					x.AfterStoppingServices(() => { Console.WriteLine("[Topshelf] All services have been stopped"); });
+				});
 		}
 
 		static void BootstrapLogger()

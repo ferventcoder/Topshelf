@@ -14,7 +14,6 @@ namespace Stuff
 {
     using System;
     using System.IO;
-    using System.Timers;
     using log4net.Config;
     using Topshelf;
     using Topshelf.Configuration;
@@ -25,47 +24,29 @@ namespace Stuff
         static void Main(string[] args)
         {
             XmlConfigurator.ConfigureAndWatch(new FileInfo(".\\log4net.config"));
-            RunConfiguration cfg = RunnerConfigurator.New(x =>
-            {
-                x.AfterStoppingServices(h => { Console.WriteLine("AfterStoppingServices action invoked, services are stopping"); });
 
-                x.ConfigureService<TownCrier>(s =>
+            var h = HostFactory.New(x =>
                 {
-                    s.Named("tc");
-                    s.HowToBuildService(name=> new TownCrier());
-                    s.WhenStarted(tc => tc.Start());
-                    s.WhenStopped(tc => tc.Stop());
+                    x.AfterStoppingServices(n => Console.WriteLine("AfterStoppingServices action invoked, services are stopping"));
+
+                    x.EnableDashboard();
+                    
+                    x.Service<TownCrier>(s =>
+                        {
+                            s.SetServiceName("TownCrier");
+                            s.ConstructUsing(name => new TownCrier());
+                            s.WhenStarted(tc => tc.Start());
+                            s.WhenStopped(tc => tc.Stop());
+                        });
+
+                    x.RunAsLocalSystem();
+
+                    x.SetDescription("Sample Topshelf Host");
+                    x.SetDisplayName("Stuff");
+                    x.SetServiceName("stuff");
                 });
 
-                x.RunAsLocalSystem();
-
-                x.SetDescription("Sample Topshelf Host");
-                x.SetDisplayName("Stuff");
-                x.SetServiceName("stuff");
-            });
-
-            Runner.Host(cfg, args);
-        }
-    }
-
-    public class TownCrier
-    {
-        readonly Timer _timer;
-
-        public TownCrier()
-        {
-            _timer = new Timer(1000) {AutoReset = true};
-            _timer.Elapsed += (sender, eventArgs) => Console.WriteLine(DateTime.Now);
-        }
-
-        public void Start()
-        {
-            _timer.Start();
-        }
-
-        public void Stop()
-        {
-            _timer.Stop();
+            h.Run();
         }
     }
 }
